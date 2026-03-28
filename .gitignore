@@ -2,6 +2,7 @@ HELP.md
 
 ### Local secrets (never commit) ###
 .env
+.env.docker
 .env.local
 .env.*.local
 

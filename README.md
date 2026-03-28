@@ -112,20 +112,40 @@ Requisitos: [Docker](https://docs.docker.com/get-docker/) y Docker Compose v2.
 
 MySQL se crea automáticamente con la base `pet_adoption` y un usuario de aplicación; la app espera a que MySQL pase el healthcheck antes de arrancar.
 
+### `.env` local frente a `.env.docker` (Compose)
+
+| Archivo | Uso |
+|---------|-----|
+| **`.env`** | Desarrollo en el host: `./mvnw spring-boot-run`, tests, IDE. JDBC con `localhost`, tus credenciales. **No lo pises** al usar Docker. |
+| **`.env.docker`** | Solo para `docker compose` (archivo en `.gitignore`, crearlo manualmente). Copiar desde [`.env.docker.example`](.env.docker.example). |
+
+Compose, por defecto, también lee `.env` del directorio del proyecto para sustituir variables en `docker-compose.yml`. Para **no mezclar** configuración local con la del stack en contenedores, usar siempre:
+
+```bash
+docker compose --env-file .env.docker up --build
+```
+
+La URL JDBC del contenedor `app` se resuelve con **`COMPOSE_DATABASE_URL`** en la interpolación del compose (por defecto `jdbc:mysql://mysql:3306/pet_adoption`). Así un `DATABASE_URL=jdbc:mysql://localhost:...` en tu **`.env` local** (para `./mvnw`) **no** rompe el stack Docker: esa variable ya no alimenta el servicio `app` en `docker-compose.yml`. Si necesitas parámetros extra en la URL dentro de Docker, define `COMPOSE_DATABASE_URL` en `.env.docker` (sigue siendo host `mysql`, puerto `3306`, nunca `localhost` ni el puerto publicado en el host).
+
+### Si algo falla al levantar el stack
+
+- **Contraseña de MySQL rechazada** tras cambiar `MYSQL_*` en `.env.docker`: el volumen `mysql_data` puede haberse inicializado con credenciales anteriores. Prueba `docker compose --env-file .env.docker down -v` (borra datos locales del contenedor MySQL) y vuelve a subir.
+- **Puerto del host**: `MYSQL_HOST_PORT` solo cambia el mapeo en tu máquina; el contenedor `app` sigue usando `mysql:3306` por dentro.
+
 ### Arranque desde cero
 
-1. Copia la plantilla de variables (o úsala al vuelo):
+1. Crea el archivo de variables de Docker (una vez):
    ```bash
-   cp .env.docker.example .env
+   cp .env.docker.example .env.docker
    ```
-   Edita `.env` y cambia al menos `MYSQL_ROOT_PASSWORD`, `DATABASE_PASSWORD` y `JWT_SECRET` (valores de ejemplo **no** son adecuados para producción).
+   Edita `.env.docker`: `MYSQL_ROOT_PASSWORD`, `MYSQL_APP_PASSWORD` (y opcionalmente `MYSQL_APP_USER`), `JWT_SECRET`, y si hace falta `MYSQL_HOST_PORT` (ver siguiente apartado).
 
 2. Construye y levanta los servicios:
    ```bash
-   docker compose up --build
+   docker compose --env-file .env.docker up --build
    ```
 
-   Equivalente sin copiar archivo:
+   Prueba rápida con la plantilla sin copiar (valores de ejemplo, no producción):
    ```bash
    docker compose --env-file .env.docker.example up --build
    ```
@@ -134,34 +154,36 @@ MySQL se crea automáticamente con la base `pet_adoption` y un usuario de aplica
 
 ### Puerto 3306 ya en uso
 
-Si en tu máquina ya corre otro MySQL (u otro servicio) en el puerto **3306**, el mapeo del contenedor fallará. Opciones:
+Si en tu máquina ya corre otro MySQL en el puerto **3306**, el servicio `mysql` del compose no podrá mapear `3306:3306` en el host. Opciones:
 
-- Define en tu `.env` otro puerto host, por ejemplo `MYSQL_HOST_PORT=3307`, y conecta desde el host con `jdbc:mysql://localhost:3307/pet_adoption`.
-- O usa un `docker-compose.override.yml` local (no versionado) solo en tu equipo para ajustar `ports`.
+- En **`.env.docker`** define `MYSQL_HOST_PORT=3307` (u otro libre). Dentro de la red Docker la app sigue usando el puerto **3306** del contenedor `mysql`; solo cambia el puerto en **tu máquina** para conectarte con un cliente externo.
+- O usa un `docker-compose.override.yml` local (no versionado) para ajustar `ports`.
 
 Quien clone el repo y no tenga nada escuchando en 3306 puede usar el valor por defecto sin cambios.
 
 ### Solo MySQL en Docker, app en el host
 
-1. Levanta únicamente la base:
+1. Levanta únicamente la base (usa el mismo archivo que para el stack completo):
    ```bash
-   docker compose up mysql
+   docker compose --env-file .env.docker up mysql
    ```
-2. En tu `.env` (o variables de entorno) usa **`localhost`** en la URL JDBC, y el mismo `DATABASE_USERNAME` / `DATABASE_PASSWORD` que definiste para el servicio MySQL (por defecto `petuser` / `petpassword` si no personalizaste):
+2. En **`.env` local** (no en `.env.docker`) apunta a `localhost` y usa el **mismo usuario y contraseña de aplicación** que en `.env.docker` (`MYSQL_APP_USER` / `MYSQL_APP_PASSWORD`, por defecto `petapp`). Si cambiaste el puerto del host (`MYSQL_HOST_PORT`), ajústalo en la URL:
    ```bash
    DATABASE_URL=jdbc:mysql://localhost:3306/pet_adoption
+   DATABASE_USERNAME=petapp
+   DATABASE_PASSWORD=<igual que MYSQL_APP_PASSWORD en .env.docker>
    ```
 3. Ejecuta `./mvnw spring-boot-run` como siempre.
 
-### App en Docker: host JDBC
+### App en Docker: JDBC y usuario de BD
 
-Dentro de Compose el host del servidor MySQL es el nombre del servicio: **`mysql`** (ya reflejado en `.env.docker.example`). No uses `localhost` en `DATABASE_URL` del contenedor `app`: apuntaría al propio contenedor de la aplicación.
+Host JDBC: servicio **`mysql`**, puerto **3306** en la red interna (variable opcional **`COMPOSE_DATABASE_URL`** en `.env.docker` o el default del `docker-compose.yml`). La app se conecta con **`MYSQL_APP_USER`** / **`MYSQL_APP_PASSWORD`** (usuario limitado a la base `pet_adoption`; `MYSQL_ROOT_PASSWORD` es solo para admin del motor). En local con `.env` y `./mvnw` sigues usando **`DATABASE_URL`** y credenciales que quieras (`localhost`, `root`, etc.); no hace falta duplicar eso en `.env.docker` para el contenedor `app`.
 
 ### Seguridad (recordatorio)
 
-- No subas `.env` con secretos reales; rota contraseñas y `JWT_SECRET` fuera de los ejemplos del repositorio.
-- El mapeo `3306:3306` es cómodo para **desarrollo**; en entornos expuestos a red, evita publicar MySQL al host o restringe firewall y credenciales.
-- La aplicación corre en el contenedor como usuario no root.
+- No subir `.env` / `.env.docker` con secretos reales; `JWT_SECRET` y contraseñas fuertes en prod.
+- MySQL publicado en un puerto del host: asumir solo desarrollo; en red expuesta, restringe acceso.
+- Proceso Java en imagen sin root; JDBC en compose sin usuario `root` de MySQL (menor privilegio).
 
 ## Ejecución local (sin Docker)
 
