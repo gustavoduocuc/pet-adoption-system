@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Gestionar mascotas</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<h1>Mascotas</h1>
+	<p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+	<p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+	<p><a class="btn btn-primary" th:href="@{/app/pets/new}">Nueva mascota</a></p>
+	<table>
+		<thead>
+		<tr>
+			<th>Nombre</th>
+			<th>Especie</th>
+			<th>Estado</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="pet : ${pets}">
+			<td th:text="${pet.name()}"></td>
+			<td th:text="${pet.species()}"></td>
+			<td th:text="${pet.adoptionStatus()}"></td>
+			<td>
+				<a class="btn btn-secondary" th:href="@{/app/pets/{id}/edit(id=${pet.id()})}">Editar</a>
+				<form th:action="@{/app/pets/{id}/delete(id=${pet.id()})}" method="post" style="display:inline"
+					  onsubmit="return confirm('¿Eliminar esta mascota?');">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+					<button type="submit" class="btn btn-danger">Eliminar</button>
+				</form>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	<p th:if="${pets.isEmpty()}">No hay mascotas registradas.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Acceso denegado</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<h1>Acceso denegado</h1>
+	<p>No tienes permiso para ver esta página.</p>
+	<p><a th:href="@{/catalog}">Ir al catálogo</a></p>
+</main>
+</body>
+</html>

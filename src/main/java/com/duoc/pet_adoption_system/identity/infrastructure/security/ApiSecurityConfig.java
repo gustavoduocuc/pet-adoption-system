@@ -6,12 +6,10 @@ import com.duoc.pet_adoption_system.shared.infrastructure.security.AppCorsProper
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,17 +22,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity
 @EnableConfigurationProperties(AppCorsProperties.class)
 public class ApiSecurityConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(
+	@Order(1)
+	public SecurityFilterChain apiSecurityFilterChain(
 			HttpSecurity http,
 			JwtAuthenticationFilter jwtAuthenticationFilter,
 			JsonAuthenticationEntryPoint authenticationEntryPoint,
 			JsonAccessDeniedHandler accessDeniedHandler,
 			AppCorsProperties corsProperties) throws Exception {
+		http.securityMatcher("/api/**");
 		http.csrf(csrf -> csrf.disable());
 		http.anonymous(anonymous -> anonymous.disable());
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -51,13 +50,17 @@ public class ApiSecurityConfig {
 				.requestMatchers(HttpMethod.PUT, "/api/pets/**").hasAnyRole("ADMIN", "STAFF")
 				.requestMatchers(HttpMethod.DELETE, "/api/pets/**").hasAnyRole("ADMIN", "STAFF")
 				.requestMatchers("/api/patients/**").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
-				.anyRequest().permitAll());
+				.anyRequest().denyAll());
 		http.exceptionHandling(ex -> ex
 				.authenticationEntryPoint(authenticationEntryPoint)
 				.accessDeniedHandler(accessDeniedHandler));
 		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
+	}
+
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter(JwtProperties jwtProperties) {
+		return new JwtAuthenticationFilter(jwtProperties);
 	}
 
 	@Bean
@@ -77,12 +80,5 @@ public class ApiSecurityConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public UserDetailsService noopUserDetailsService() {
-		return username -> {
-			throw new UsernameNotFoundException("Authentication uses JWT only");
-		};
 	}
 }

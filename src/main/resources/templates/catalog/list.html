@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Catálogo de mascotas</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<h1>Catálogo de mascotas</h1>
+	<p th:if="${param.logout}" class="alert alert-success">Sesión cerrada.</p>
+	<p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+
+	<form class="search-form" th:action="@{/catalog}" method="get">
+		<label>Especie
+			<input type="text" name="species" th:value="${species}"/>
+		</label>
+		<label>Edad
+			<input type="number" name="age" min="0" th:value="${age}"/>
+		</label>
+		<label>Ubicación
+			<input type="text" name="location" th:value="${location}"/>
+		</label>
+		<label>Género
+			<select name="gender">
+				<option value="">—</option>
+				<option th:each="g : ${T(com.duoc.pet_adoption_system.pets.domain.entities.PetGender).values()}"
+						th:value="${g.name()}" th:text="${g.name()}"
+						th:selected="${gender != null and gender.name() == g.name()}"></option>
+			</select>
+		</label>
+		<button type="submit" class="btn btn-primary">Buscar</button>
+		<a class="btn btn-secondary" th:href="@{/catalog}">Limpiar</a>
+	</form>
+
+	<div class="pet-grid" th:if="${!pets.isEmpty()}">
+		<article class="pet-card" th:each="pet : ${pets}">
+			<img th:src="@{/images/pet-placeholder.svg}" alt=""/>
+			<div class="body">
+				<a th:href="@{/catalog/{id}(id=${pet.id()})}" th:text="${pet.name()}">Nombre</a>
+				<p th:text="${pet.species()} + ' · ' + ${pet.breed()}">especie</p>
+				<p th:text="'Edad: ' + ${pet.age()} + ' · ' + ${pet.gender()}">meta</p>
+				<p th:text="${pet.location()}">ubicación</p>
+				<p><strong th:text="${pet.adoptionStatus()}">estado</strong></p>
+			</div>
+		</article>
+	</div>
+	<p th:if="${pets.isEmpty()}">No hay mascotas que coincidan con la búsqueda.</p>
+</main>
+</body>
+</html>

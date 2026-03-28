@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title th:text="${patient.name()}">Paciente</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<p><a th:href="@{/app/patients}">&larr; Volver al listado</a></p>
+	<h1 th:text="${patient.name()}">Nombre</h1>
+	<ul class="detail-list">
+		<li><strong>Especie:</strong> <span th:text="${patient.species()}"></span></li>
+		<li><strong>Fecha ingreso:</strong> <span th:text="${patient.intakeDate()}"></span></li>
+		<li><strong>Estado:</strong> <span th:text="${patient.careStatus()}"></span></li>
+		<li><strong>Notas:</strong> <span th:text="${patient.treatmentNotes() != null ? patient.treatmentNotes() : '—'}"></span></li>
+	</ul>
+</main>
+</body>
+</html>
