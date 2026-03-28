@@ -106,7 +106,64 @@ Los nombres en `.env` deben coincidir con las variables de la tabla anterior (`D
 
 **Nota:** `./mvnw test` no pasa por `main()`; las pruebas siguen usando `application-test.properties` y no dependen de `.env`.
 
-## Ejecución local
+## Docker (MySQL + aplicación)
+
+Requisitos: [Docker](https://docs.docker.com/get-docker/) y Docker Compose v2.
+
+MySQL se crea automáticamente con la base `pet_adoption` y un usuario de aplicación; la app espera a que MySQL pase el healthcheck antes de arrancar.
+
+### Arranque desde cero
+
+1. Copia la plantilla de variables (o úsala al vuelo):
+   ```bash
+   cp .env.docker.example .env
+   ```
+   Edita `.env` y cambia al menos `MYSQL_ROOT_PASSWORD`, `DATABASE_PASSWORD` y `JWT_SECRET` (valores de ejemplo **no** son adecuados para producción).
+
+2. Construye y levanta los servicios:
+   ```bash
+   docker compose up --build
+   ```
+
+   Equivalente sin copiar archivo:
+   ```bash
+   docker compose --env-file .env.docker.example up --build
+   ```
+
+3. Abre la aplicación en `http://localhost:8080` (catálogo en `/catalog`). Salud: `GET http://localhost:8080/actuator/health`.
+
+### Puerto 3306 ya en uso
+
+Si en tu máquina ya corre otro MySQL (u otro servicio) en el puerto **3306**, el mapeo del contenedor fallará. Opciones:
+
+- Define en tu `.env` otro puerto host, por ejemplo `MYSQL_HOST_PORT=3307`, y conecta desde el host con `jdbc:mysql://localhost:3307/pet_adoption`.
+- O usa un `docker-compose.override.yml` local (no versionado) solo en tu equipo para ajustar `ports`.
+
+Quien clone el repo y no tenga nada escuchando en 3306 puede usar el valor por defecto sin cambios.
+
+### Solo MySQL en Docker, app en el host
+
+1. Levanta únicamente la base:
+   ```bash
+   docker compose up mysql
+   ```
+2. En tu `.env` (o variables de entorno) usa **`localhost`** en la URL JDBC, y el mismo `DATABASE_USERNAME` / `DATABASE_PASSWORD` que definiste para el servicio MySQL (por defecto `petuser` / `petpassword` si no personalizaste):
+   ```bash
+   DATABASE_URL=jdbc:mysql://localhost:3306/pet_adoption
+   ```
+3. Ejecuta `./mvnw spring-boot-run` como siempre.
+
+### App en Docker: host JDBC
+
+Dentro de Compose el host del servidor MySQL es el nombre del servicio: **`mysql`** (ya reflejado en `.env.docker.example`). No uses `localhost` en `DATABASE_URL` del contenedor `app`: apuntaría al propio contenedor de la aplicación.
+
+### Seguridad (recordatorio)
+
+- No subas `.env` con secretos reales; rota contraseñas y `JWT_SECRET` fuera de los ejemplos del repositorio.
+- El mapeo `3306:3306` es cómodo para **desarrollo**; en entornos expuestos a red, evita publicar MySQL al host o restringe firewall y credenciales.
+- La aplicación corre en el contenedor como usuario no root.
+
+## Ejecución local (sin Docker)
 
 Requisitos: Java 21, Maven, MySQL con la base de datos creada (por ejemplo `pet_adoption`).
 
