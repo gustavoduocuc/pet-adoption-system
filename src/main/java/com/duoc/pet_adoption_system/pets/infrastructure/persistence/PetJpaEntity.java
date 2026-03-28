@@ -2,6 +2,7 @@ package com.duoc.pet_adoption_system.pets.infrastructure.persistence;
 
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,8 +21,9 @@ public class PetJpaEntity {
 	@Column(nullable = false, length = 200)
 	private String name;
 
-	@Column(nullable = false, length = 100)
-	private String species;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 20)
+	private PetSpecies species;
 
 	@Column(length = 200)
 	private String breed;
@@ -56,11 +58,11 @@ public class PetJpaEntity {
 		this.name = name;
 	}
 
-	public String getSpecies() {
+	public PetSpecies getSpecies() {
 		return species;
 	}
 
-	public void setSpecies(String species) {
+	public void setSpecies(PetSpecies species) {
 		this.species = species;
 	}
 

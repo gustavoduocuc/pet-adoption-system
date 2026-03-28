@@ -60,7 +60,7 @@ Ruta base de la API REST: **`/api`**.
 |--------|------|---------------|-------|
 | GET | `/api/pets` | Ninguna | Público |
 | GET | `/api/pets/available` | Ninguna | Público |
-| GET | `/api/pets/search` | Ninguna | Público (parámetros de consulta `species`, `age`, `location`, `gender`, todos opcionales) |
+| GET | `/api/pets/search` | Ninguna | Público (parámetros opcionales: `species` como enum `DOG`, `CAT`, `BIRD`, `RABBIT`, `REPTILE`, `OTHER`; `age`; `location`; `gender`) |
 | GET | `/api/pets/{id}` | Ninguna | Público |
 | POST | `/api/pets` | JWT obligatorio | `ADMIN`, `STAFF` |
 | PUT | `/api/pets/{id}` | JWT obligatorio | `ADMIN`, `STAFF` |
@@ -105,6 +105,16 @@ Para no subir secretos al repositorio:
 Los nombres en `.env` deben coincidir con las variables de la tabla anterior (`DATABASE_PASSWORD`, `JWT_SECRET`, …).
 
 **Nota:** `./mvnw test` no pasa por `main()`; las pruebas siguen usando `application-test.properties` y no dependen de `.env`.
+
+## Persistencia y consultas
+
+El acceso a datos usa **Spring Data JPA** y **Criteria API** (`Specification`) para búsquedas dinámicas; los valores se enlazan como parámetros preparados, **sin concatenar SQL** con entrada de usuario. No se usa JDBC directo ni `@Query` nativo con texto armado en runtime. Las peticiones HTTP aplican **Bean Validation** (`@Valid`, `@Validated`, `@Size`) como defensa en profundidad y alineación con el esquema.
+
+### Especie de mascota (`PetSpecies`)
+
+En **API y dominio** la especie es un **enum en inglés** (`DOG`, `CAT`, `BIRD`, `RABBIT`, `REPTILE`, `OTHER`). Los cuerpos JSON de alta/edición deben usar esos literales. En la **interfaz Thymeleaf** las etiquetas se muestran en **español** mediante `messages.properties` / `messages_es.properties` (p. ej. `DOG` → “Perro”). Al arrancar, una migración ligera normaliza filas antiguas con texto libre: valores reconocibles se alinean al enum; el resto pasa a `OTHER`.
+
+Valores inválidos en query (`species=FOO`) o en JSON devuelven **400**.
 
 ## Docker (MySQL + aplicación)
 

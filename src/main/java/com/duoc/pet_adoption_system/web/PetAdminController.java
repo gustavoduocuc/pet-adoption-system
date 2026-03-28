@@ -7,6 +7,7 @@ import com.duoc.pet_adoption_system.pets.application.ListAllPetsUseCase;
 import com.duoc.pet_adoption_system.pets.application.UpdatePetUseCase;
 import com.duoc.pet_adoption_system.web.dto.PetView;
 import com.duoc.pet_adoption_system.web.forms.PetForm;
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/app/pets")
+@Validated
 public class PetAdminController {
 
 	private final ListAllPetsUseCase listAllPetsUseCase;
@@ -71,7 +74,7 @@ public class PetAdminController {
 	}
 
 	@GetMapping("/{id}/edit")
-	public String editForm(@PathVariable String id, Model model) {
+	public String editForm(@PathVariable @Size(max = 36) String id, Model model) {
 		var pet = getPetByIdUseCase.execute(id);
 		PetForm form = new PetForm();
 		form.setName(pet.name());
@@ -89,7 +92,7 @@ public class PetAdminController {
 
 	@PostMapping("/{id}/edit")
 	public String update(
-			@PathVariable String id,
+			@PathVariable @Size(max = 36) String id,
 			@ModelAttribute PetForm petForm,
 			RedirectAttributes redirectAttributes) {
 		if (!isPetFormValid(petForm)) {
@@ -110,7 +113,7 @@ public class PetAdminController {
 	}
 
 	@PostMapping("/{id}/delete")
-	public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
+	public String delete(@PathVariable @Size(max = 36) String id, RedirectAttributes redirectAttributes) {
 		deletePetUseCase.execute(id);
 		redirectAttributes.addFlashAttribute("successMessage", "Mascota eliminada.");
 		return "redirect:/app/pets";
@@ -118,7 +121,7 @@ public class PetAdminController {
 
 	private static boolean isPetFormValid(PetForm f) {
 		return f.getName() != null && !f.getName().isBlank()
-				&& f.getSpecies() != null && !f.getSpecies().isBlank()
+				&& f.getSpecies() != null
 				&& f.getLocation() != null && !f.getLocation().isBlank()
 				&& f.getGender() != null
 				&& f.getAdoptionStatus() != null;

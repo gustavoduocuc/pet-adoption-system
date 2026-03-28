@@ -8,7 +8,9 @@ import com.duoc.pet_adoption_system.pets.application.ListAvailablePetsUseCase;
 import com.duoc.pet_adoption_system.pets.application.SearchPetsUseCase;
 import com.duoc.pet_adoption_system.pets.application.UpdatePetUseCase;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/pets")
+@Validated
 public class PetController {
 
 	private final ListAllPetsUseCase listAllPetsUseCase;
@@ -64,9 +68,9 @@ public class PetController {
 
 	@GetMapping("/search")
 	public List<PetResponse> search(
-			@RequestParam(required = false) String species,
+			@RequestParam(required = false) PetSpecies species,
 			@RequestParam(required = false) Integer age,
-			@RequestParam(required = false) String location,
+			@RequestParam(required = false) @Size(max = 300) String location,
 			@RequestParam(required = false) PetGender gender) {
 		return searchPetsUseCase.execute(species, age, location, gender).stream()
 				.map(PetResponse::from)
@@ -74,7 +78,7 @@ public class PetController {
 	}
 
 	@GetMapping("/{id}")
-	public PetResponse getById(@PathVariable String id) {
+	public PetResponse getById(@PathVariable @Size(max = 36) String id) {
 		return PetResponse.from(getPetByIdUseCase.execute(id));
 	}
 
@@ -93,7 +97,7 @@ public class PetController {
 	}
 
 	@PutMapping("/{id}")
-	public PetResponse update(@PathVariable String id, @Valid @RequestBody UpdatePetRequest request) {
+	public PetResponse update(@PathVariable @Size(max = 36) String id, @Valid @RequestBody UpdatePetRequest request) {
 		var pet = updatePetUseCase.execute(
 				id,
 				request.name(),
@@ -108,7 +112,7 @@ public class PetController {
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void delete(@PathVariable String id) {
+	public void delete(@PathVariable @Size(max = 36) String id) {
 		deletePetUseCase.execute(id);
 	}
 }

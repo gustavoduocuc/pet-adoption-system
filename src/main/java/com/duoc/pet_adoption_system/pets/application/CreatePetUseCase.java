@@ -3,6 +3,7 @@ package com.duoc.pet_adoption_system.pets.application;
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.pets.domain.repositories.PetRepository;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 
@@ -16,7 +17,7 @@ public class CreatePetUseCase {
 
 	public Pet execute(
 			String name,
-			String species,
+			PetSpecies species,
 			String breed,
 			int age,
 			String location,

@@ -7,7 +7,7 @@ public final class Pet {
 
 	private final Id id;
 	private String name;
-	private String species;
+	private PetSpecies species;
 	private String breed;
 	private int age;
 	private String location;
@@ -17,7 +17,7 @@ public final class Pet {
 	private Pet(
 			Id id,
 			String name,
-			String species,
+			PetSpecies species,
 			String breed,
 			int age,
 			String location,
@@ -36,21 +36,21 @@ public final class Pet {
 	public static Pet create(
 			Id id,
 			String name,
-			String species,
+			PetSpecies species,
 			String breed,
 			int age,
 			String location,
 			PetGender gender,
 			AdoptionStatus adoptionStatus) {
 		validateCore(name, species, age, location, gender, adoptionStatus);
-		return new Pet(id, name.trim(), species.trim(), breed == null ? "" : breed.trim(), age, location.trim(), gender,
+		return new Pet(id, name.trim(), species, breed == null ? "" : breed.trim(), age, location.trim(), gender,
 				adoptionStatus);
 	}
 
 	public static Pet restore(
 			Id id,
 			String name,
-			String species,
+			PetSpecies species,
 			String breed,
 			int age,
 			String location,
@@ -61,7 +61,7 @@ public final class Pet {
 
 	private static void validateCore(
 			String name,
-			String species,
+			PetSpecies species,
 			int age,
 			String location,
 			PetGender gender,
@@ -69,8 +69,8 @@ public final class Pet {
 		if (name == null || name.isBlank()) {
 			throw DomainError.validation("Pet name must not be blank");
 		}
-		if (species == null || species.isBlank()) {
-			throw DomainError.validation("Species must not be blank");
+		if (species == null) {
+			throw DomainError.validation("Species is required");
 		}
 		if (age < 0) {
 			throw DomainError.validation("Age must not be negative");
@@ -88,7 +88,7 @@ public final class Pet {
 
 	public void updateDetails(
 			String name,
-			String species,
+			PetSpecies species,
 			String breed,
 			int age,
 			String location,
@@ -96,7 +96,7 @@ public final class Pet {
 			AdoptionStatus adoptionStatus) {
 		validateCore(name, species, age, location, gender, adoptionStatus);
 		this.name = name.trim();
-		this.species = species.trim();
+		this.species = species;
 		this.breed = breed == null ? "" : breed.trim();
 		this.age = age;
 		this.location = location.trim();
@@ -112,7 +112,7 @@ public final class Pet {
 		return name;
 	}
 
-	public String species() {
+	public PetSpecies species() {
 		return species;
 	}
 

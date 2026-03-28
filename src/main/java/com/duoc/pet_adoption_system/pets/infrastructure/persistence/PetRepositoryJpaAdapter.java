@@ -3,6 +3,7 @@ package com.duoc.pet_adoption_system.pets.infrastructure.persistence;
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.pets.domain.repositories.PetRepository;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 import org.springframework.data.domain.Sort;
@@ -51,7 +52,7 @@ public class PetRepositoryJpaAdapter implements PetRepository {
 	}
 
 	@Override
-	public List<Pet> search(String species, Integer age, String location, PetGender gender) {
+	public List<Pet> search(PetSpecies species, Integer age, String location, PetGender gender) {
 		Specification<PetJpaEntity> spec = PetSpecifications.withOptionalFilters(species, age, location, gender);
 		return springData.findAll(spec, Sort.by(Sort.Order.asc("name"))).stream()
 				.map(this::toDomain)

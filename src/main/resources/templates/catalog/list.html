@@ -15,7 +15,13 @@
 
 	<form class="search-form" th:action="@{/catalog}" method="get">
 		<label>Especie
-			<input type="text" name="species" th:value="${species}"/>
+			<select name="species">
+				<option value="">—</option>
+				<option th:each="s : ${T(com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies).values()}"
+						th:value="${s.name()}"
+						th:text="#{__${'petSpecies.' + s.name()}__}"
+						th:selected="${species != null and species.name() == s.name()}"></option>
+			</select>
 		</label>
 		<label>Edad
 			<input type="number" name="age" min="0" th:value="${age}"/>
@@ -40,7 +46,7 @@
 			<img th:src="@{/images/pet-placeholder.svg}" alt=""/>
 			<div class="body">
 				<a th:href="@{/catalog/{id}(id=${pet.id()})}" th:text="${pet.name()}">Nombre</a>
-				<p th:text="${pet.species()} + ' · ' + ${pet.breed()}">especie</p>
+				<p><span th:text="#{__${'petSpecies.' + pet.species().name()}__}">especie</span><span th:text="' · ' + ${pet.breed()}"></span></p>
 				<p th:text="'Edad: ' + ${pet.age()} + ' · ' + ${pet.gender()}">meta</p>
 				<p th:text="${pet.location()}">ubicación</p>
 				<p><strong th:text="${pet.adoptionStatus()}">estado</strong></p>
