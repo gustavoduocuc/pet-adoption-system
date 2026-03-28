@@ -52,7 +52,7 @@ class SecurityAndPetsApiE2ETest {
 		mockMvc.perform(post("/api/pets")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{"name":"Luna","species":"dog","breed":"mix","age":2,"location":"Santiago","gender":"FEMALE","adoptionStatus":"AVAILABLE"}
+								{"name":"Luna","species":"DOG","breed":"mix","age":2,"location":"Santiago","gender":"FEMALE","adoptionStatus":"AVAILABLE"}
 								"""))
 				.andExpect(status().isUnauthorized());
 	}
@@ -72,7 +72,7 @@ class SecurityAndPetsApiE2ETest {
 						.header("Authorization", "Bearer " + token)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{"name":"Luna","species":"dog","breed":"mix","age":2,"location":"Santiago","gender":"FEMALE","adoptionStatus":"AVAILABLE"}
+								{"name":"Luna","species":"DOG","breed":"mix","age":2,"location":"Santiago","gender":"FEMALE","adoptionStatus":"AVAILABLE"}
 								"""))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name").value("Luna"));

@@ -25,7 +25,7 @@
 		<tbody>
 		<tr th:each="pet : ${pets}">
 			<td th:text="${pet.name()}"></td>
-			<td th:text="${pet.species()}"></td>
+			<td th:text="#{__${'petSpecies.' + pet.species().name()}__}"></td>
 			<td th:text="${pet.adoptionStatus()}"></td>
 			<td>
 				<a class="btn btn-secondary" th:href="@{/app/pets/{id}/edit(id=${pet.id()})}">Editar</a>

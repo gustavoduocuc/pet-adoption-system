@@ -4,6 +4,7 @@ import com.duoc.pet_adoption_system.patients.application.CreatePatientUseCase;
 import com.duoc.pet_adoption_system.patients.application.GetPatientByIdUseCase;
 import com.duoc.pet_adoption_system.patients.application.ListPatientsUseCase;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/patients")
+@Validated
 public class PatientController {
 
 	private final ListPatientsUseCase listPatientsUseCase;
@@ -38,7 +41,7 @@ public class PatientController {
 	}
 
 	@GetMapping("/{id}")
-	public PatientResponse getById(@PathVariable String id) {
+	public PatientResponse getById(@PathVariable @Size(max = 36) String id) {
 		return PatientResponse.from(getPatientByIdUseCase.execute(id));
 	}
 

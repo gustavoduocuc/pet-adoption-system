@@ -5,6 +5,7 @@ import com.duoc.pet_adoption_system.patients.application.GetPatientByIdUseCase;
 import com.duoc.pet_adoption_system.patients.application.ListPatientsUseCase;
 import com.duoc.pet_adoption_system.web.dto.PatientView;
 import com.duoc.pet_adoption_system.web.forms.PatientForm;
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/app/patients")
+@Validated
 public class PatientAdminController {
 
 	private final ListPatientsUseCase listPatientsUseCase;
@@ -60,7 +63,7 @@ public class PatientAdminController {
 	}
 
 	@GetMapping("/{id}")
-	public String detail(@PathVariable String id, Model model) {
+	public String detail(@PathVariable @Size(max = 36) String id, Model model) {
 		model.addAttribute("patient", PatientView.from(getPatientByIdUseCase.execute(id)));
 		return "app/patients/detail";
 	}

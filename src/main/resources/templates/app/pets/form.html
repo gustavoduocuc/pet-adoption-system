@@ -19,7 +19,12 @@
 			<input type="text" th:field="*{name}" required/>
 		</label>
 		<label>Especie
-			<input type="text" th:field="*{species}" required/>
+			<select th:field="*{species}" required>
+				<option value="">—</option>
+				<option th:each="s : ${T(com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies).values()}"
+						th:value="${s.name()}"
+						th:text="#{__${'petSpecies.' + s.name()}__}"></option>
+			</select>
 		</label>
 		<label>Raza
 			<input type="text" th:field="*{breed}"/>

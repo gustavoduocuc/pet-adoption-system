@@ -96,7 +96,7 @@ class WebThymeleafFlowE2ETest {
 		mockMvc.perform(post("/app/pets/new")
 						.session(session)
 						.param("name", "WebPet")
-						.param("species", "cat")
+						.param("species", "CAT")
 						.param("breed", "siames")
 						.param("age", "1")
 						.param("location", "Santiago")

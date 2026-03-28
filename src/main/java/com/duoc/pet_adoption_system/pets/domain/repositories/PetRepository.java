@@ -3,6 +3,7 @@ package com.duoc.pet_adoption_system.pets.domain.repositories;
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface PetRepository {
 
 	List<Pet> findByAdoptionStatus(AdoptionStatus status);
 
-	List<Pet> search(String species, Integer age, String location, PetGender gender);
+	List<Pet> search(PetSpecies species, Integer age, String location, PetGender gender);
 }

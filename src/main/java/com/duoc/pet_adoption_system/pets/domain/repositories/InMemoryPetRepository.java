@@ -3,9 +3,9 @@ package com.duoc.pet_adoption_system.pets.domain.repositories;
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -49,11 +49,10 @@ public class InMemoryPetRepository implements PetRepository {
 	}
 
 	@Override
-	public List<Pet> search(String species, Integer age, String location, PetGender gender) {
+	public List<Pet> search(PetSpecies species, Integer age, String location, PetGender gender) {
 		Stream<Pet> stream = pets.values().stream();
-		if (species != null && !species.isBlank()) {
-			String needle = species.trim().toLowerCase(Locale.ROOT);
-			stream = stream.filter(p -> p.species().toLowerCase(Locale.ROOT).contains(needle));
+		if (species != null) {
+			stream = stream.filter(p -> p.species() == species);
 		}
 		if (age != null) {
 			stream = stream.filter(p -> p.age() == age);

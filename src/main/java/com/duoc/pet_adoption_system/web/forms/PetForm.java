@@ -2,11 +2,12 @@ package com.duoc.pet_adoption_system.web.forms;
 
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 
 public class PetForm {
 
 	private String name = "";
-	private String species = "";
+	private PetSpecies species;
 	private String breed = "";
 	private int age;
 	private String location = "";
@@ -21,11 +22,11 @@ public class PetForm {
 		this.name = name;
 	}
 
-	public String getSpecies() {
+	public PetSpecies getSpecies() {
 		return species;
 	}
 
-	public void setSpecies(String species) {
+	public void setSpecies(PetSpecies species) {
 		this.species = species;
 	}
 

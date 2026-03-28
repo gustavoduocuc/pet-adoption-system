@@ -3,11 +3,12 @@ package com.duoc.pet_adoption_system.pets.infrastructure.http;
 import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
+import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 
 public record PetResponse(
 		String id,
 		String name,
-		String species,
+		PetSpecies species,
 		String breed,
 		int age,
 		String location,
