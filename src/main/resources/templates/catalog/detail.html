@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title th:text="${pet.name()}">Detalle</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<p><a th:href="@{/catalog}">&larr; Volver al catálogo</a></p>
+	<img th:src="@{/images/pet-placeholder.svg}" alt="" style="max-width:100%;border-radius:8px;margin-bottom:1rem"/>
+	<h1 th:text="${pet.name()}">Nombre</h1>
+	<ul class="detail-list">
+		<li><strong>Especie:</strong> <span th:text="${pet.species()}"></span></li>
+		<li><strong>Raza:</strong> <span th:text="${pet.breed()}"></span></li>
+		<li><strong>Edad:</strong> <span th:text="${pet.age()}"></span></li>
+		<li><strong>Género:</strong> <span th:text="${pet.gender()}"></span></li>
+		<li><strong>Ubicación:</strong> <span th:text="${pet.location()}"></span></li>
+		<li><strong>Estado adopción:</strong> <span th:text="${pet.adoptionStatus()}"></span></li>
+	</ul>
+</main>
+</body>
+</html>

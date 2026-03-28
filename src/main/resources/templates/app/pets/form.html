@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title th:text="${editMode} ? 'Editar mascota' : 'Nueva mascota'">Mascota</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<h1 th:text="${editMode} ? 'Editar mascota' : 'Nueva mascota'">Mascota</h1>
+	<p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+	<form class="form-stack" th:object="${petForm}"
+		  th:action="${editMode} ? @{/app/pets/{id}/edit(id=${petId})} : @{/app/pets/new}"
+		  method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		<label>Nombre
+			<input type="text" th:field="*{name}" required/>
+		</label>
+		<label>Especie
+			<input type="text" th:field="*{species}" required/>
+		</label>
+		<label>Raza
+			<input type="text" th:field="*{breed}"/>
+		</label>
+		<label>Edad
+			<input type="number" th:field="*{age}" min="0" required/>
+		</label>
+		<label>Ubicación
+			<input type="text" th:field="*{location}" required/>
+		</label>
+		<label>Género
+			<select th:field="*{gender}" required>
+				<option value="">—</option>
+				<option th:each="g : ${T(com.duoc.pet_adoption_system.pets.domain.entities.PetGender).values()}"
+						th:value="${g.name()}" th:text="${g.name()}"></option>
+			</select>
+		</label>
+		<label>Estado adopción
+			<select th:field="*{adoptionStatus}" required>
+				<option value="">—</option>
+				<option th:each="s : ${T(com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus).values()}"
+						th:value="${s.name()}" th:text="${s.name()}"></option>
+			</select>
+		</label>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary" th:text="${editMode} ? 'Guardar' : 'Crear'">Guardar</button>
+			<a class="btn btn-secondary" th:href="@{/app/pets}">Cancelar</a>
+		</div>
+	</form>
+</main>
+</body>
+</html>

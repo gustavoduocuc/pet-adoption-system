@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Nuevo paciente</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<h1>Registrar paciente</h1>
+	<p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+	<form class="form-stack" th:object="${patientForm}" th:action="@{/app/patients/new}" method="post">
+		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		<label>Nombre
+			<input type="text" th:field="*{name}" required/>
+		</label>
+		<label>Especie
+			<input type="text" th:field="*{species}" required/>
+		</label>
+		<label>Fecha de ingreso
+			<input type="date" th:field="*{intakeDate}" required/>
+		</label>
+		<label>Notas de tratamiento
+			<textarea th:field="*{treatmentNotes}" rows="3"></textarea>
+		</label>
+		<label>Estado de cuidado
+			<select th:field="*{careStatus}" required>
+				<option value="">—</option>
+				<option th:each="c : ${T(com.duoc.pet_adoption_system.patients.domain.entities.CareStatus).values()}"
+						th:value="${c.name()}" th:text="${c.name()}"></option>
+			</select>
+		</label>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary">Registrar</button>
+			<a class="btn btn-secondary" th:href="@{/app/patients}">Cancelar</a>
+		</div>
+	</form>
+</main>
+</body>
+</html>

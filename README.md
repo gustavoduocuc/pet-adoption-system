@@ -1,6 +1,6 @@
 # Sistema de adopción de mascotas
 
-API backend para adopción de mascotas y registro veterinario básico de animales rescatados. Construida con Spring Boot, autenticación JWT sin estado, control de acceso por roles y persistencia en MySQL.
+Aplicación para adopción de mascotas y registro veterinario básico de animales rescatados. Incluye **API REST** (`/api/**`) con **JWT sin estado** y **interfaz web** con **Thymeleaf**, **login por formulario** y **sesión HTTP** (cookie `JSESSIONID`). Persistencia en MySQL.
 
 ## Stack
 
@@ -9,6 +9,7 @@ API backend para adopción de mascotas y registro veterinario básico de animale
 - Spring Web MVC, Spring Security, Spring Data JPA
 - MySQL (`mysql-connector-j`)
 - JWT (biblioteca JJWT) para autenticación de la API
+- Thymeleaf + Spring Security (form login y CSRF en la parte web)
 - Bean Validation (`@Valid`)
 
 ## Roles
@@ -17,17 +18,31 @@ API backend para adopción de mascotas y registro veterinario básico de animale
 |-----|-------------|
 | **ADMIN** | Acceso completo: gestionar mascotas y pacientes veterinarios. |
 | **STAFF** | En esta API, equivalente a ADMIN: gestionar mascotas y pacientes. |
-| **USER** | Solo lectura en zonas protegidas: puede usar los endpoints públicos del catálogo de mascotas. No puede crear, actualizar ni eliminar mascotas ni acceder a pacientes. |
+| **USER** | En la **API**: solo lectura pública del catálogo (`GET /api/pets/**`). No puede crear, actualizar ni eliminar mascotas ni acceder a pacientes. En la **web**: puede iniciar sesión y usar el catálogo HTML (`/catalog`); **no** puede entrar a `/app/**` (gestión). |
+| **ADMIN** / **STAFF** | API y web: gestión de mascotas y pacientes según los endpoints y rutas descritos abajo. |
 
 Los claims del JWT incluyen los nombres de rol; Spring Security los mapea a autoridades `ROLE_ADMIN`, `ROLE_STAFF`, `ROLE_USER`.
 
-## Autenticación
+## Autenticación: API (JWT) frente a navegador (sesión)
+
+Hay **dos cadenas de seguridad**: `/api/**` usa **JWT y sesión desactivada**; el resto del sitio usa **formulario de login, sesión y CSRF** en formularios POST. No mezcles JWT en `localStorage` para las páginas HTML: el navegador usa solo la cookie de sesión para Thymeleaf.
+
+### Clientes API (Postman, integraciones, SPA futura)
 
 1. Llamar `POST /api/auth/login` con cuerpo JSON `{"username":"...","password":"..."}`.
 2. Respuesta: `{"accessToken":"...","tokenType":"Bearer"}` (nunca se devuelven contraseñas).
-3. En rutas protegidas, enviar cabecera: `Authorization: Bearer <accessToken>`.
+3. En rutas protegidas de `/api/**`, enviar cabecera: `Authorization: Bearer <accessToken>`.
 
-Las peticiones sin autenticar a rutas protegidas reciben **401** en JSON. Los usuarios autenticados sin rol suficiente reciben **403** en JSON.
+Las peticiones sin autenticar a rutas protegidas de la API reciben **401** en JSON. Los usuarios autenticados sin rol suficiente reciben **403** en JSON.
+
+### Navegador (Thymeleaf)
+
+1. Abrir `/login`, enviar usuario y contraseña con el formulario (incluye token CSRF).
+2. Tras un login correcto, **ADMIN** y **STAFF** se redirigen a `/app/pets`; **USER** se redirige a `/catalog`.
+3. Las rutas bajo `/app/**` exigen rol **ADMIN** o **STAFF**. **USER** verá la página de acceso denegado si intenta entrar ahí.
+4. Cerrar sesión: formulario POST a `/logout` (por ejemplo desde la barra de navegación de la plantilla).
+
+Rutas web útiles: `/` (redirige al catálogo), `/catalog`, `/catalog/{id}`, `/app/pets`, `/app/patients` (listado, alta y detalle; **no** hay eliminación de pacientes en la UI hasta exista `DELETE` en la API).
 
 ## Endpoints de la API
 

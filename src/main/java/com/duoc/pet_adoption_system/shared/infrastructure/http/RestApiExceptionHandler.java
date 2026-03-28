@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = {
+		"com.duoc.pet_adoption_system.pets.infrastructure.http",
+		"com.duoc.pet_adoption_system.patients.infrastructure.http",
+		"com.duoc.pet_adoption_system.identity.infrastructure.http"
+})
 public class RestApiExceptionHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(RestApiExceptionHandler.class);

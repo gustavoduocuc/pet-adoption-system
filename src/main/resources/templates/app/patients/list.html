@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Pacientes veterinarios</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}"/>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main>
+	<h1>Pacientes veterinarios</h1>
+	<p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+	<p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+	<p><a class="btn btn-primary" th:href="@{/app/patients/new}">Registrar paciente</a></p>
+	<table>
+		<thead>
+		<tr>
+			<th>Nombre</th>
+			<th>Especie</th>
+			<th>Ingreso</th>
+			<th>Estado</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="p : ${patients}">
+			<td th:text="${p.name()}"></td>
+			<td th:text="${p.species()}"></td>
+			<td th:text="${p.intakeDate()}"></td>
+			<td th:text="${p.careStatus()}"></td>
+			<td><a class="btn btn-secondary" th:href="@{/app/patients/{id}(id=${p.id()})}">Ver</a></td>
+		</tr>
+		</tbody>
+	</table>
+	<p th:if="${patients.isEmpty()}">No hay pacientes registrados.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<nav th:fragment="nav" class="nav">
+	<a th:href="@{/catalog}">Catálogo</a>
+	<th:block sec:authorize="hasAnyRole('ADMIN','STAFF')">
+		<a th:href="@{/app/pets}">Gestionar mascotas</a>
+		<a th:href="@{/app/patients}">Pacientes veterinarios</a>
+	</th:block>
+	<span style="margin-left:auto"></span>
+	<th:block sec:authorize="isAuthenticated()">
+		<form th:action="@{/logout}" method="post">
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+			<button type="submit">Cerrar sesión</button>
+		</form>
+	</th:block>
+	<th:block sec:authorize="!isAuthenticated()">
+		<a th:href="@{/login}">Iniciar sesión</a>
+	</th:block>
+</nav>
+</body>
+</html>
