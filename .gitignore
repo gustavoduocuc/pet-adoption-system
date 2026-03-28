@@ -5,6 +5,9 @@ HELP.md
 .env.local
 .env.*.local
 
+### Local Docker overrides ###
+docker-compose.override.yml
+
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
