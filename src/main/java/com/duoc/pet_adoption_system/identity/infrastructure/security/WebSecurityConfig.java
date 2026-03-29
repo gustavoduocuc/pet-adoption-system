@@ -20,14 +20,14 @@ public class WebSecurityConfig {
 		http.securityMatcher(request -> !request.getRequestURI().startsWith("/api/"));
 		http.headers(headers -> headers
 				.contentSecurityPolicy(csp -> csp.policyDirectives(
-						"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-ancestors 'none'"))
+						"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'"))
 				.frameOptions(frame -> frame.deny())
 				.referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
 				.httpStrictTransportSecurity(hsts -> hsts.disable()));
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/", "/catalog", "/catalog/**").permitAll()
 				.requestMatchers("/login", "/error", "/access-denied").permitAll()
-				.requestMatchers("/css/**", "/images/**").permitAll()
+				.requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
 				.requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
 				.requestMatchers("/app/**").hasAnyRole("ADMIN", "STAFF")
 				.anyRequest().authenticated());

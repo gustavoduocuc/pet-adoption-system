@@ -29,8 +29,8 @@
 			<td th:text="${pet.adoptionStatus()}"></td>
 			<td>
 				<a class="btn btn-secondary" th:href="@{/app/pets/{id}/edit(id=${pet.id()})}">Editar</a>
-				<form th:action="@{/app/pets/{id}/delete(id=${pet.id()})}" method="post" style="display:inline"
-					  onsubmit="return confirm('¿Eliminar esta mascota?');">
+				<form class="form-inline-delete pet-delete-form"
+					  th:action="@{/app/pets/{id}/delete(id=${pet.id()})}" method="post">
 					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 					<button type="submit" class="btn btn-danger">Eliminar</button>
 				</form>
@@ -40,5 +40,6 @@
 	</table>
 	<p th:if="${pets.isEmpty()}">No hay mascotas registradas.</p>
 </main>
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>
