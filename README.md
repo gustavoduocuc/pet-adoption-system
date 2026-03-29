@@ -78,7 +78,9 @@ Ruta base de la API REST: **`/api`**.
 
 | Método | Ruta | Autenticación | Roles |
 |--------|------|---------------|-------|
-| GET | `/actuator/health` | Ninguna | Público |
+| GET | `/actuator/health` | Ninguna (solo si la IP del cliente está permitida) | Solo desde IPs/CIDR en `ACTUATOR_HEALTH_ALLOWED_IPS` (`.env`) o `app.security.actuator-health.allowed-ips` |
+
+**Nota:** Detrás de un proxy inverso, la IP vista por la app suele ser la del proxy. Configura `server.forward-headers-strategy` (p. ej. `framework`) y restringe quién puede enviar `X-Forwarded-For`, o añade la IP interna del proxy a la lista permitida.
 
 ## Configuración
 
@@ -92,6 +94,7 @@ Se define en `application.properties` o variables de entorno:
 | `JWT_SECRET` / `app.security.jwt.secret` | Secreto para firmar JWT (usar un valor fuerte en producción) |
 | `JWT_EXPIRATION_MINUTES` / `app.security.jwt.expiration-minutes` | Duración del token |
 | `CORS_ORIGIN_1`, `CORS_ORIGIN_2` / `app.cors.allowed-origins[n]` | Orígenes permitidos del navegador para `/api/**` |
+| `ACTUATOR_HEALTH_ALLOWED_IPS` / `app.security.actuator-health.allowed-ips` | Lista separada por comas de IPs o CIDR permitidos para `GET /actuator/health`. Definir en `.env` o en el entorno del SO para no versionar rangos de producción. |
 
 ### Archivo `.env` (desarrollo local)
 
@@ -160,7 +163,7 @@ La URL JDBC del contenedor `app` se resuelve con **`COMPOSE_DATABASE_URL`** en l
    docker compose --env-file .env.docker.example up --build
    ```
 
-3. Abre la aplicación en `http://localhost:8080` (catálogo en `/catalog`). Salud: `GET http://localhost:8080/actuator/health`.
+3. Abre la aplicación en `http://localhost:8080` (catálogo en `/catalog`). Salud: `GET http://localhost:8080/actuator/health` solo responde **200** si la IP está en `ACTUATOR_HEALTH_ALLOWED_IPS` (p. ej. en `.env`; por defecto loopback).
 
 ### Puerto 3306 ya en uso
 
