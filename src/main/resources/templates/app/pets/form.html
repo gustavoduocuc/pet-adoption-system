@@ -17,6 +17,7 @@
 		<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 		<label>Nombre
 			<input type="text" th:field="*{name}" required/>
+			<span class="field-error" th:errors="*{name}"></span>
 		</label>
 		<label>Especie
 			<select th:field="*{species}" required>
@@ -25,15 +26,19 @@
 						th:value="${s.name()}"
 						th:text="#{__${'petSpecies.' + s.name()}__}"></option>
 			</select>
+			<span class="field-error" th:errors="*{species}"></span>
 		</label>
 		<label>Raza
 			<input type="text" th:field="*{breed}"/>
+			<span class="field-error" th:errors="*{breed}"></span>
 		</label>
 		<label>Edad
 			<input type="number" th:field="*{age}" min="0" required/>
+			<span class="field-error" th:errors="*{age}"></span>
 		</label>
 		<label>Ubicación
 			<input type="text" th:field="*{location}" required/>
+			<span class="field-error" th:errors="*{location}"></span>
 		</label>
 		<label>Género
 			<select th:field="*{gender}" required>
@@ -41,6 +46,7 @@
 				<option th:each="g : ${T(com.duoc.pet_adoption_system.pets.domain.entities.PetGender).values()}"
 						th:value="${g.name()}" th:text="${g.name()}"></option>
 			</select>
+			<span class="field-error" th:errors="*{gender}"></span>
 		</label>
 		<label>Estado adopción
 			<select th:field="*{adoptionStatus}" required>
@@ -48,6 +54,7 @@
 				<option th:each="s : ${T(com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus).values()}"
 						th:value="${s.name()}" th:text="${s.name()}"></option>
 			</select>
+			<span class="field-error" th:errors="*{adoptionStatus}"></span>
 		</label>
 		<div class="form-actions">
 			<button type="submit" class="btn btn-primary" th:text="${editMode} ? 'Guardar' : 'Crear'">Guardar</button>

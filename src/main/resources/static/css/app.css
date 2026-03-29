@@ -228,3 +228,10 @@ th {
 	border-radius: 8px;
 	border: 1px solid #e2e5eb;
 }
+
+.field-error {
+	display: block;
+	color: #7f1d1d;
+	font-size: 0.85rem;
+	margin-top: 0.25rem;
+}

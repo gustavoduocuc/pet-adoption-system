@@ -85,13 +85,7 @@ class WebThymeleafFlowE2ETest {
 
 	@Test
 	void staffCanCreatePetViaWebForm() throws Exception {
-		MockHttpSession session = new MockHttpSession();
-		mockMvc.perform(post("/login")
-						.session(session)
-						.param("username", "staff")
-						.param("password", "staff123")
-						.with(csrf()))
-				.andExpect(status().is3xxRedirection());
+		MockHttpSession session = newStaffSession();
 
 		mockMvc.perform(post("/app/pets/new")
 						.session(session)
@@ -110,5 +104,68 @@ class WebThymeleafFlowE2ETest {
 						throw new AssertionError("Expected redirect to /app/pets/{id}/edit, got: " + url);
 					}
 				});
+	}
+
+	@Test
+	void staffSeesValidationErrorWhenPetNameIsNotAlphanumeric() throws Exception {
+		MockHttpSession session = newStaffSession();
+
+		mockMvc.perform(post("/app/pets/new")
+						.session(session)
+						.param("name", "AND 1=1 --")
+						.param("species", "CAT")
+						.param("breed", "mix")
+						.param("age", "1")
+						.param("location", "Santiago")
+						.param("gender", "FEMALE")
+						.param("adoptionStatus", "AVAILABLE")
+						.with(csrf()))
+				.andExpect(status().isOk())
+				.andExpect(content().string(containsString("Solo letras, números y espacios")));
+	}
+
+	@Test
+	void staffSeesValidationErrorWhenPetLocationContainsSemicolon() throws Exception {
+		MockHttpSession session = newStaffSession();
+
+		mockMvc.perform(post("/app/pets/new")
+						.session(session)
+						.param("name", "Luna")
+						.param("species", "CAT")
+						.param("breed", "mix")
+						.param("age", "2")
+						.param("location", "x; DROP TABLE pets")
+						.param("gender", "FEMALE")
+						.param("adoptionStatus", "AVAILABLE")
+						.with(csrf()))
+				.andExpect(status().isOk())
+				.andExpect(content().string(containsString("Solo letras, números y espacios")));
+	}
+
+	@Test
+	void staffSeesValidationErrorWhenPatientNotesContainSqlLikePattern() throws Exception {
+		MockHttpSession session = newStaffSession();
+
+		mockMvc.perform(post("/app/patients/new")
+						.session(session)
+						.param("name", "Firulais")
+						.param("species", "dog")
+						.param("intakeDate", "2025-06-01")
+						.param("treatmentNotes", "union select id from users")
+						.param("careStatus", "UNDER_CARE")
+						.with(csrf()))
+				.andExpect(status().isOk())
+				.andExpect(content().string(containsString("patrones")));
+	}
+
+	private MockHttpSession newStaffSession() throws Exception {
+		MockHttpSession session = new MockHttpSession();
+		mockMvc.perform(post("/login")
+						.session(session)
+						.param("username", "staff")
+						.param("password", "staff123")
+						.with(csrf()))
+				.andExpect(status().is3xxRedirection());
+		return session;
 	}
 }
