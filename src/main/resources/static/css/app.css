@@ -235,3 +235,17 @@ th {
 	font-size: 0.85rem;
 	margin-top: 0.25rem;
 }
+
+.nav-spacer {
+	margin-left: auto;
+}
+
+.form-inline-delete {
+	display: inline;
+}
+
+.catalog-detail-image {
+	max-width: 100%;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+}

@@ -10,7 +10,7 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 <main>
 	<p><a th:href="@{/catalog}">&larr; Volver al catálogo</a></p>
-	<img th:src="@{/images/pet-placeholder.svg}" alt="" style="max-width:100%;border-radius:8px;margin-bottom:1rem"/>
+	<img class="catalog-detail-image" th:src="@{/images/pet-placeholder.svg}" alt=""/>
 	<h1 th:text="${pet.name()}">Nombre</h1>
 	<ul class="detail-list">
 		<li><strong>Especie:</strong> <span th:text="#{__${'petSpecies.' + pet.species().name()}__}"></span></li>

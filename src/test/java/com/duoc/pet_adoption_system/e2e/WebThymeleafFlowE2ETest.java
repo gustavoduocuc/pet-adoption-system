@@ -9,10 +9,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +31,16 @@ class WebThymeleafFlowE2ETest {
 		mockMvc.perform(get("/catalog"))
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("Catálogo de mascotas")));
+	}
+
+	@Test
+	void catalogResponseHasStrictWebContentSecurityPolicy() throws Exception {
+		mockMvc.perform(get("/catalog"))
+				.andExpect(status().isOk())
+				.andExpect(header().string("Content-Security-Policy", containsString("form-action 'self'")))
+				.andExpect(header().string("Content-Security-Policy", containsString("img-src 'self' data:")))
+				.andExpect(header().string("Content-Security-Policy", not(containsString("unsafe-inline"))))
+				.andExpect(header().string("Content-Security-Policy", not(containsString("https:"))));
 	}
 
 	@Test
