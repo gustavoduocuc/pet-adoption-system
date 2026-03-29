@@ -163,7 +163,33 @@ La URL JDBC del contenedor `app` se resuelve con **`COMPOSE_DATABASE_URL`** en l
    docker compose --env-file .env.docker.example up --build
    ```
 
-3. Abre la aplicación en `http://localhost:8080` (catálogo en `/catalog`). Salud: `GET http://localhost:8080/actuator/health` solo responde **200** si la IP está en `ACTUATOR_HEALTH_ALLOWED_IPS` (p. ej. en `.env`; por defecto loopback).
+3. Abre la aplicación en `http://localhost:8080` (catálogo en `/catalog`). Salud: `GET /actuator/health` según la política de IPs / loopback descrita en la tabla de endpoints y en `.env.docker`.
+
+### HTTPS con Apache (opcional)
+
+El servicio **`proxy`** (`httpd:2.4`) escucha **443**, termina TLS y hace reverse proxy a **`http://app:8080`**. No arranca por defecto: hay que usar el perfil Compose **`https`**.
+
+1. Crea **`server.crt`** y **`server.key`** en [`docker/apache/certs/`](docker/apache/certs/):
+   ```bash
+   ./docker/apache/certs/generate-dev-certs.sh
+   ```
+2. Si se consume la API desde el navegador en **`https://localhost`** (u otro origen HTTPS), añade ese origen en **`CORS_ORIGIN_1`** / **`CORS_ORIGIN_2`** en `.env.docker` (además de `http://localhost:8080` si sigues usándolo).
+3. Levanta MySQL, app y proxy:
+   ```bash
+   docker compose --env-file .env.docker --profile https up --build
+   ```
+4. Probar **`https://localhost/catalog`** (certificado autofirmado: el navegador mostrará advertencia). El puerto del proxy HTTPS es **`HTTPS_HOST_PORT`** (por defecto **443**). También puedes entrar por **`http://localhost/catalog`** (puerto **80** del host): Apache responde **301** y te manda a `https://…` (mismo host y ruta).
+5. Comprueba que **`docker compose --env-file .env.docker --profile https`** esté en uso, que existan `docker/apache/certs/server.crt` y `server.key`, y que **80** y **443** no estén ocupados en el host (o cambia `HTTP_REDIRECT_HOST_PORT` / `HTTPS_HOST_PORT` en `.env.docker`).
+
+Sin `--profile https`, `docker compose --env-file .env.docker up --build` sigue levantando solo **`mysql`** y **`app`** con HTTP en el puerto del host mapeado a 8080 (`APP_HOST_PORT`).
+
+Flujo: cliente → **HTTPS:443** (o **HTTP:80** → redirección) → contenedor `proxy` → **HTTP** interno → **`app:8080`** → JDBC → `mysql`.
+
+#### Producción (idea simple)
+
+- El **8080** de la app es **solo red interna** (Docker)
+- Lo público son **80** y **443** en el balanceador o en Apache; ahí sí tiene sentido **HTTP → HTTPS**.
+- En Compose “tipo prod” suele usarse un `docker-compose.override.yml` (no versionado) que **quita** `ports` del servicio `app` y deja solo `proxy` publicado.
 
 ### Puerto 3306 ya en uso
 
