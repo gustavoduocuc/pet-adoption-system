@@ -16,10 +16,10 @@ Aplicación para adopción de mascotas y registro veterinario básico de animale
 
 | Rol | Descripción |
 |-----|-------------|
-| **ADMIN** | Acceso completo: gestionar mascotas y pacientes veterinarios. |
-| **STAFF** | En esta API, equivalente a ADMIN: gestionar mascotas y pacientes. |
-| **USER** | En la **API**: solo lectura pública del catálogo (`GET /api/pets/**`). No puede crear, actualizar ni eliminar mascotas ni acceder a pacientes. En la **web**: puede iniciar sesión y usar el catálogo HTML (`/catalog`); **no** puede entrar a `/app/**` (gestión). |
-| **ADMIN** / **STAFF** | API y web: gestión de mascotas y pacientes según los endpoints y rutas descritos abajo. |
+| **ADMIN** | Acceso completo: gestionar mascotas, pacientes veterinarios y citas. |
+| **STAFF** | En esta API, equivalente a ADMIN: gestionar mascotas, pacientes y citas. |
+| **USER** | En la **API**: solo lectura pública del catálogo (`GET /api/pets/**`); puede llamar `GET /api/appointments/my` con JWT para listar las citas asociadas a su usuario. No puede crear, actualizar ni eliminar mascotas ni acceder al resto de pacientes o citas. En la **web**: puede iniciar sesión y usar el catálogo HTML (`/catalog`); **no** puede entrar a `/app/**` (gestión). |
+| **ADMIN** / **STAFF** | API y web: gestión de mascotas, pacientes y citas según los endpoints y rutas descritos abajo. |
 
 Los claims del JWT incluyen los nombres de rol; Spring Security los mapea a autoridades `ROLE_ADMIN`, `ROLE_STAFF`, `ROLE_USER`.
 
@@ -73,6 +73,16 @@ Ruta base de la API REST: **`/api`**.
 | GET | `/api/patients` | JWT obligatorio | `ADMIN`, `STAFF` |
 | GET | `/api/patients/{id}` | JWT obligatorio | `ADMIN`, `STAFF` |
 | POST | `/api/patients` | JWT obligatorio | `ADMIN`, `STAFF` |
+
+### Citas (vinculadas a pacientes)
+
+| Método | Ruta | Autenticación | Roles |
+|--------|------|---------------|-------|
+| GET | `/api/appointments/my` | JWT obligatorio | Cualquier usuario autenticado (lista filtrada por el `subject` del JWT) |
+| GET | `/api/appointments` | JWT obligatorio | `ADMIN`, `STAFF` |
+| GET | `/api/appointments/{patientId}` | JWT obligatorio | `ADMIN`, `STAFF` (todas las citas de ese paciente) |
+| POST | `/api/appointments/new/{patientId}` | JWT obligatorio | `ADMIN`, `STAFF` |
+| PUT | `/api/appointments/update/{appointmentId}` | JWT obligatorio | `ADMIN`, `STAFF` |
 
 ### Operaciones (salud)
 

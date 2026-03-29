@@ -49,6 +49,11 @@ public class ApiSecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/pets").hasAnyRole("ADMIN", "STAFF")
 				.requestMatchers(HttpMethod.PUT, "/api/pets/**").hasAnyRole("ADMIN", "STAFF")
 				.requestMatchers(HttpMethod.DELETE, "/api/pets/**").hasAnyRole("ADMIN", "STAFF")
+				.requestMatchers(HttpMethod.GET, "/api/appointments/my").authenticated()
+				.requestMatchers(HttpMethod.POST, "/api/appointments/new/**").hasAnyRole("ADMIN", "STAFF")
+				.requestMatchers(HttpMethod.PUT, "/api/appointments/update/**").hasAnyRole("ADMIN", "STAFF")
+				.requestMatchers(HttpMethod.GET, "/api/appointments").hasAnyRole("ADMIN", "STAFF")
+				.requestMatchers(HttpMethod.GET, "/api/appointments/*").hasAnyRole("ADMIN", "STAFF")
 				.requestMatchers("/api/patients/**").hasAnyRole("ADMIN", "STAFF")
 				.anyRequest().denyAll());
 		http.exceptionHandling(ex -> ex
