@@ -259,3 +259,13 @@ En producción, cambiar contraseñas y desactivar o sustituir esta carga inicial
 ```
 
 Las pruebas usan el perfil `test` con base de datos **H2** en memoria (el driver MySQL sigue siendo la dependencia de ejecución para despliegues reales).
+
+## Seguridad de dependencias (SCA)
+
+El proyecto incluye OWASP Dependency-Check para análisis on-demand con Maven:
+
+```bash
+./mvnw -Psecurity-scan -DskipTests dependency-check:check
+```
+
+Guía operativa corta: [`docs/security/owasp-dependency-check.md`](docs/security/owasp-dependency-check.md).
