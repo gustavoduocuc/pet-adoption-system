@@ -62,4 +62,91 @@ class PetTest {
 		assertEquals(PetSpecies.CAT, pet.species());
 		assertEquals(3, pet.age());
 	}
+
+	@Test
+	void createRejectsBlankName() {
+		assertThrows(DomainError.class, () -> Pet.create(
+				Id.generate(),
+				"  ",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE));
+	}
+
+	@Test
+	void createRejectsNegativeAge() {
+		assertThrows(DomainError.class, () -> Pet.create(
+				Id.generate(),
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				-1,
+				"Santiago",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE));
+	}
+
+	@Test
+	void createRejectsBlankLocation() {
+		assertThrows(DomainError.class, () -> Pet.create(
+				Id.generate(),
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"  ",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE));
+	}
+
+	@Test
+	void createRejectsNullGender() {
+		assertThrows(DomainError.class, () -> Pet.create(
+				Id.generate(),
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				null,
+				AdoptionStatus.AVAILABLE));
+	}
+
+	@Test
+	void createRejectsNullAdoptionStatus() {
+		assertThrows(DomainError.class, () -> Pet.create(
+				Id.generate(),
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				PetGender.FEMALE,
+				null));
+	}
+
+	@Test
+	void updateRejectsInvalidValues() {
+		Pet pet = Pet.create(
+				Id.generate(),
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE);
+
+		assertThrows(DomainError.class, () -> pet.updateDetails(
+				"  ",
+				PetSpecies.CAT,
+				"siames",
+				3,
+				"Valparaiso",
+				PetGender.FEMALE,
+				AdoptionStatus.ADOPTED));
+	}
 }
