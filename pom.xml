@@ -30,6 +30,7 @@
 		<java.version>21</java.version>
 		<tomcat.version>11.0.21</tomcat.version>
 		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+		<sonar.projectKey>pet-adoption-system</sonar.projectKey>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -165,6 +166,11 @@
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<failBuildOnCVSS>11</failBuildOnCVSS>
 						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.sonarqube.scanner.maven</groupId>
+						<artifactId>sonar-maven-plugin</artifactId>
+						<version>4.0.0.4121</version>
 					</plugin>
 				</plugins>
 			</build>

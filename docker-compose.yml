@@ -51,5 +51,56 @@ services:
       app:
         condition: service_started
 
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    ports:
+      - "${JENKINS_UI_HOST_PORT:-9090}:8080"
+      - "${JENKINS_AGENT_PORT:-50000}:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - app_net
+
+  sonar_db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${SONAR_POSTGRES_USER:-sonar}
+      POSTGRES_PASSWORD: ${SONAR_POSTGRES_PASSWORD:-sonar}
+      POSTGRES_DB: ${SONAR_POSTGRES_DB:-sonar}
+    volumes:
+      - sonar_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app_net
+
+  sonarqube:
+    image: sonarqube:lts-community
+    depends_on:
+      sonar_db:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonar_db:5432/${SONAR_POSTGRES_DB:-sonar}
+      SONAR_JDBC_USERNAME: ${SONAR_POSTGRES_USER:-sonar}
+      SONAR_JDBC_PASSWORD: ${SONAR_POSTGRES_PASSWORD:-sonar}
+    ports:
+      - "${SONAR_HOST_PORT:-9000}:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    networks:
+      - app_net
+
 volumes:
   mysql_data:
+  jenkins_home:
+  sonar_db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+
+networks:
+  app_net:
+    driver: bridge
