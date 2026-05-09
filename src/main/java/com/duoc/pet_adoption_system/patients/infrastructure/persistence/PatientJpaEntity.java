@@ -18,10 +18,10 @@ public class PatientJpaEntity {
 	@Column(length = 36)
 	private String id;
 
-	@Column(nullable = false, length = 200)
+	@Column(nullable = false, length = 120)
 	private String name;
 
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 120)
 	private String species;
 
 	@Column(name = "intake_date", nullable = false)

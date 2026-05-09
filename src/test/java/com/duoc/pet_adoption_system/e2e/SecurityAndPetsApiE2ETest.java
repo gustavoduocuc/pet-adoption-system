@@ -93,4 +93,24 @@ class SecurityAndPetsApiE2ETest {
 						.header("Authorization", "Bearer " + token))
 				.andExpect(status().isForbidden());
 	}
+
+	@Test
+	void createPatientWithInvalidNameReturnsBadRequest() throws Exception {
+		String body = mockMvc.perform(post("/api/auth/login")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"username\":\"staff\",\"password\":\"staff123\"}"))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+		String token = JsonPath.read(body, "$.accessToken");
+
+		mockMvc.perform(post("/api/patients")
+						.header("Authorization", "Bearer " + token)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{"name":"'; DROP TABLE patients;--","species":"dog","intakeDate":"2026-03-01","treatmentNotes":null,"careStatus":"UNDER_CARE"}
+								"""))
+				.andExpect(status().isBadRequest());
+	}
 }

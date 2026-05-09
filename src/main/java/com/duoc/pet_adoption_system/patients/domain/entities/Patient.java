@@ -4,8 +4,13 @@ import com.duoc.pet_adoption_system.shared.domain.DomainError;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 
 import java.time.LocalDate;
+import java.util.regex.Pattern;
 
 public final class Patient {
+
+	private static final int maxNameLength = 120;
+	private static final int maxSpeciesLength = 120;
+	private static final Pattern lettersNumbersAndSpacesOnly = Pattern.compile("^[A-Za-z0-9 ]+$");
 
 	private final Id id;
 	private String name;
@@ -57,11 +62,25 @@ public final class Patient {
 	}
 
 	private static void validate(String name, String species, LocalDate intakeDate, CareStatus careStatus) {
-		if (name == null || name.isBlank()) {
+		String trimmedName = name == null ? "" : name.trim();
+		String trimmedSpecies = species == null ? "" : species.trim();
+		if (trimmedName.isEmpty()) {
 			throw DomainError.validation("Patient name must not be blank");
 		}
-		if (species == null || species.isBlank()) {
+		if (trimmedName.length() > maxNameLength) {
+			throw DomainError.validation("Patient name must be at most " + maxNameLength + " characters");
+		}
+		if (!lettersNumbersAndSpacesOnly.matcher(trimmedName).matches()) {
+			throw DomainError.validation("Patient name must contain only letters, numbers and spaces");
+		}
+		if (trimmedSpecies.isEmpty()) {
 			throw DomainError.validation("Species must not be blank");
+		}
+		if (trimmedSpecies.length() > maxSpeciesLength) {
+			throw DomainError.validation("Species must be at most " + maxSpeciesLength + " characters");
+		}
+		if (!lettersNumbersAndSpacesOnly.matcher(trimmedSpecies).matches()) {
+			throw DomainError.validation("Species must contain only letters, numbers and spaces");
 		}
 		if (intakeDate == null) {
 			throw DomainError.validation("Intake date is required");
