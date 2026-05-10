@@ -2,6 +2,9 @@
 
 Aplicación para adopción de mascotas y registro veterinario básico de animales rescatados. Incluye **API REST** (`/api/**`) con **JWT sin estado** y **interfaz web** con **Thymeleaf**, **login por formulario** y **sesión HTTP** (cookie `JSESSIONID`). Persistencia en MySQL.
 
+<img width="1388" height="629" alt="Screenshot 2026-05-10 at 5 50 56 PM" src="https://github.com/user-attachments/assets/0c7a15ea-2067-43e9-9559-7d9b7df6f7a6" />
+
+
 ## Stack
 
 - Java 21
