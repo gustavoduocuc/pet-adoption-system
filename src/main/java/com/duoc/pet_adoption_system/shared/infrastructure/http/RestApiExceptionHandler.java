@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 })
 public class RestApiExceptionHandler {
 
+	private static final String JSON_KEY_ERROR = "error";
+	private static final String JSON_KEY_MESSAGE = "message";
+
 	private static final Logger log = LoggerFactory.getLogger(RestApiExceptionHandler.class);
 
 	@ExceptionHandler(DomainError.class)
@@ -30,28 +33,28 @@ public class RestApiExceptionHandler {
 			case OTHER -> HttpStatus.BAD_REQUEST;
 		};
 		return ResponseEntity.status(status)
-				.body(Map.of("error", status.getReasonPhrase(), "message", error.getMessage()));
+				.body(Map.of(JSON_KEY_ERROR, status.getReasonPhrase(), JSON_KEY_MESSAGE, error.getMessage()));
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<Map<String, String>> handleUnreadableJson(HttpMessageNotReadableException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Bad Request", "message", "Invalid request body"));
+				.body(Map.of(JSON_KEY_ERROR, "Bad Request", JSON_KEY_MESSAGE, "Invalid request body"));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
-		String message = ex.getBindingResult().getFieldErrors().stream()
+		String validationSummary = ex.getBindingResult().getFieldErrors().stream()
 				.map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
 				.collect(Collectors.joining("; "));
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Bad Request", "message", message));
+				.body(Map.of(JSON_KEY_ERROR, "Bad Request", JSON_KEY_MESSAGE, validationSummary));
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, String>> handleUnexpected(Exception ex) {
 		log.error("Unhandled exception", ex);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(Map.of("error", "Internal Server Error", "message", "An unexpected error occurred"));
+				.body(Map.of(JSON_KEY_ERROR, "Internal Server Error", JSON_KEY_MESSAGE, "An unexpected error occurred"));
 	}
 }
