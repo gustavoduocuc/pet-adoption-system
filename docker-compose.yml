@@ -52,12 +52,13 @@ services:
         condition: service_started
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    image: jenkins/jenkins:lts-jdk21
     ports:
       - "${JENKINS_UI_HOST_PORT:-9090}:8080"
       - "${JENKINS_AGENT_PORT:-50000}:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
+      - .:/workspace
     networks:
       - app_net
 
