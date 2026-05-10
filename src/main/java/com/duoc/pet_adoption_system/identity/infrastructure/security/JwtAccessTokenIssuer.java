@@ -8,7 +8,6 @@ import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class JwtAccessTokenIssuer implements AccessTokenIssuer {
 
@@ -24,7 +23,7 @@ public class JwtAccessTokenIssuer implements AccessTokenIssuer {
 	public String issue(String username, Set<UserRole> roles) {
 		Instant now = Instant.now();
 		Instant exp = now.plusSeconds(properties.getExpirationMinutes() * 60);
-		var roleNames = roles.stream().map(Enum::name).collect(Collectors.toList());
+		var roleNames = roles.stream().map(Enum::name).toList();
 		return Jwts.builder()
 				.subject(username)
 				.claim("roles", roleNames)
