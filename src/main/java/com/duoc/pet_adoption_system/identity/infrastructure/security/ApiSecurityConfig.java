@@ -25,6 +25,10 @@ import java.util.List;
 @EnableConfigurationProperties(AppCorsProperties.class)
 public class ApiSecurityConfig {
 
+	private static final String apiPetsWildcardPath = "/api/pets/**";
+	private static final String adminRole = "ADMIN";
+	private static final String staffRole = "STAFF";
+
 	@Bean
 	@Order(1)
 	public SecurityFilterChain apiSecurityFilterChain(
@@ -45,16 +49,16 @@ public class ApiSecurityConfig {
 				.httpStrictTransportSecurity(hsts -> hsts.disable()));
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/pets", "/api/pets/**").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/pets").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers(HttpMethod.PUT, "/api/pets/**").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers(HttpMethod.DELETE, "/api/pets/**").hasAnyRole("ADMIN", "STAFF")
+				.requestMatchers(HttpMethod.GET, "/api/pets", apiPetsWildcardPath).permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/pets").hasAnyRole(adminRole, staffRole)
+				.requestMatchers(HttpMethod.PUT, apiPetsWildcardPath).hasAnyRole(adminRole, staffRole)
+				.requestMatchers(HttpMethod.DELETE, apiPetsWildcardPath).hasAnyRole(adminRole, staffRole)
 				.requestMatchers(HttpMethod.GET, "/api/appointments/my").authenticated()
-				.requestMatchers(HttpMethod.POST, "/api/appointments/new/**").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers(HttpMethod.PUT, "/api/appointments/update/**").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers(HttpMethod.GET, "/api/appointments").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers(HttpMethod.GET, "/api/appointments/*").hasAnyRole("ADMIN", "STAFF")
-				.requestMatchers("/api/patients/**").hasAnyRole("ADMIN", "STAFF")
+				.requestMatchers(HttpMethod.POST, "/api/appointments/new/**").hasAnyRole(adminRole, staffRole)
+				.requestMatchers(HttpMethod.PUT, "/api/appointments/update/**").hasAnyRole(adminRole, staffRole)
+				.requestMatchers(HttpMethod.GET, "/api/appointments").hasAnyRole(adminRole, staffRole)
+				.requestMatchers(HttpMethod.GET, "/api/appointments/*").hasAnyRole(adminRole, staffRole)
+				.requestMatchers("/api/patients/**").hasAnyRole(adminRole, staffRole)
 				.anyRequest().denyAll());
 		http.exceptionHandling(ex -> ex
 				.authenticationEntryPoint(authenticationEntryPoint)
