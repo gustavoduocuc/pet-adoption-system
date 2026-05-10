@@ -1,7 +1,6 @@
 package com.duoc.pet_adoption_system.appointments.infrastructure.persistence;
 
 import com.duoc.pet_adoption_system.appointments.domain.entities.Appointment;
-import com.duoc.pet_adoption_system.appointments.domain.entities.AppointmentStatus;
 import com.duoc.pet_adoption_system.appointments.domain.repositories.AppointmentRepository;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 import org.springframework.stereotype.Repository;
