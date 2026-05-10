@@ -5,6 +5,7 @@ import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.pets.domain.repositories.PetRepository;
+import com.duoc.pet_adoption_system.pets.domain.valueobjects.PetAttributes;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -62,13 +63,14 @@ public class PetRepositoryJpaAdapter implements PetRepository {
 	private Pet toDomain(PetJpaEntity entity) {
 		return Pet.restore(
 				Id.of(entity.getId()),
-				entity.getName(),
-				entity.getSpecies(),
-				entity.getBreed() == null ? "" : entity.getBreed(),
-				entity.getAge(),
-				entity.getLocation(),
-				entity.getGender(),
-				entity.getAdoptionStatus());
+				new PetAttributes(
+						entity.getName(),
+						entity.getSpecies(),
+						entity.getBreed() == null ? "" : entity.getBreed(),
+						entity.getAge(),
+						entity.getLocation(),
+						entity.getGender(),
+						entity.getAdoptionStatus()));
 	}
 
 	private PetJpaEntity toEntity(Pet pet) {

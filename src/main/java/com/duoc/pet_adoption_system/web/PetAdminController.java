@@ -5,6 +5,7 @@ import com.duoc.pet_adoption_system.pets.application.DeletePetUseCase;
 import com.duoc.pet_adoption_system.pets.application.GetPetByIdUseCase;
 import com.duoc.pet_adoption_system.pets.application.ListAllPetsUseCase;
 import com.duoc.pet_adoption_system.pets.application.UpdatePetUseCase;
+import com.duoc.pet_adoption_system.pets.domain.valueobjects.PetAttributes;
 import com.duoc.pet_adoption_system.web.dto.PetView;
 import com.duoc.pet_adoption_system.web.forms.PetForm;
 import jakarta.validation.Valid;
@@ -107,13 +108,14 @@ public class PetAdminController {
 		}
 		updatePetUseCase.execute(
 				id,
-				petForm.getName(),
-				petForm.getSpecies(),
-				petForm.getBreed(),
-				petForm.getAge(),
-				petForm.getLocation(),
-				petForm.getGender(),
-				petForm.getAdoptionStatus());
+				new PetAttributes(
+						petForm.getName(),
+						petForm.getSpecies(),
+						petForm.getBreed(),
+						petForm.getAge(),
+						petForm.getLocation(),
+						petForm.getGender(),
+						petForm.getAdoptionStatus()));
 		redirectAttributes.addFlashAttribute("successMessage", "Mascota actualizada.");
 		return "redirect:/app/pets";
 	}

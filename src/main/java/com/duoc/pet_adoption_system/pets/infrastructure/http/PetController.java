@@ -9,6 +9,7 @@ import com.duoc.pet_adoption_system.pets.application.SearchPetsUseCase;
 import com.duoc.pet_adoption_system.pets.application.UpdatePetUseCase;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
+import com.duoc.pet_adoption_system.pets.domain.valueobjects.PetAttributes;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
@@ -100,13 +101,14 @@ public class PetController {
 	public PetResponse update(@PathVariable @Size(max = 36) String id, @Valid @RequestBody UpdatePetRequest request) {
 		var pet = updatePetUseCase.execute(
 				id,
-				request.name(),
-				request.species(),
-				request.breed(),
-				request.age(),
-				request.location(),
-				request.gender(),
-				request.adoptionStatus());
+				new PetAttributes(
+						request.name(),
+						request.species(),
+						request.breed(),
+						request.age(),
+						request.location(),
+						request.gender(),
+						request.adoptionStatus()));
 		return PetResponse.from(pet);
 	}
 

@@ -5,6 +5,7 @@ import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.pets.domain.repositories.PetRepository;
+import com.duoc.pet_adoption_system.pets.domain.valueobjects.PetAttributes;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 
 public class CreatePetUseCase {
@@ -23,7 +24,9 @@ public class CreatePetUseCase {
 			String location,
 			PetGender gender,
 			AdoptionStatus adoptionStatus) {
-		Pet pet = Pet.create(Id.generate(), name, species, breed, age, location, gender, adoptionStatus);
+		Pet pet = Pet.create(
+				Id.generate(),
+				new PetAttributes(name, species, breed, age, location, gender, adoptionStatus));
 		petRepository.save(pet);
 		return pet;
 	}
