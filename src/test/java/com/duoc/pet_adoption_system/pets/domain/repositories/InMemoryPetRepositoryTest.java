@@ -4,6 +4,7 @@ import com.duoc.pet_adoption_system.pets.domain.entities.AdoptionStatus;
 import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
+import com.duoc.pet_adoption_system.pets.domain.valueobjects.PetAttributes;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 import org.junit.jupiter.api.Test;
 
@@ -150,6 +151,6 @@ class InMemoryPetRepositoryTest {
 	}
 
 	private Pet createPet(String name, PetSpecies species, int age, String location, PetGender gender, AdoptionStatus status) {
-		return Pet.create(Id.generate(), name, species, "mix", age, location, gender, status);
+		return Pet.create(Id.generate(), new PetAttributes(name, species, "mix", age, location, gender, status));
 	}
 }

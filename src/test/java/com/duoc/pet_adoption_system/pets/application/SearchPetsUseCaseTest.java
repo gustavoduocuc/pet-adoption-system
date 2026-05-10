@@ -5,6 +5,7 @@ import com.duoc.pet_adoption_system.pets.domain.entities.Pet;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetGender;
 import com.duoc.pet_adoption_system.pets.domain.entities.PetSpecies;
 import com.duoc.pet_adoption_system.pets.domain.repositories.InMemoryPetRepository;
+import com.duoc.pet_adoption_system.pets.domain.valueobjects.PetAttributes;
 import com.duoc.pet_adoption_system.shared.domain.valueobjects.Id;
 import org.junit.jupiter.api.Test;
 
@@ -19,22 +20,24 @@ class SearchPetsUseCaseTest {
 		InMemoryPetRepository repository = new InMemoryPetRepository();
 		Pet dog = Pet.create(
 				Id.generate(),
-				"Rex",
-				PetSpecies.DOG,
-				"mix",
-				3,
-				"Santiago",
-				PetGender.MALE,
-				AdoptionStatus.AVAILABLE);
+				new PetAttributes(
+						"Rex",
+						PetSpecies.DOG,
+						"mix",
+						3,
+						"Santiago",
+						PetGender.MALE,
+						AdoptionStatus.AVAILABLE));
 		Pet cat = Pet.create(
 				Id.generate(),
-				"Mimi",
-				PetSpecies.CAT,
-				"siames",
-				2,
-				"Valparaiso",
-				PetGender.FEMALE,
-				AdoptionStatus.AVAILABLE);
+				new PetAttributes(
+						"Mimi",
+						PetSpecies.CAT,
+						"siames",
+						2,
+						"Valparaiso",
+						PetGender.FEMALE,
+						AdoptionStatus.AVAILABLE));
 		repository.save(dog);
 		repository.save(cat);
 		var useCase = new SearchPetsUseCase(repository);
