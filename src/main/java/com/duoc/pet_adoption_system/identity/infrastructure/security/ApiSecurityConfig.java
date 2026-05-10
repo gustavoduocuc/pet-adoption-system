@@ -32,7 +32,7 @@ public class ApiSecurityConfig {
 			JwtAuthenticationFilter jwtAuthenticationFilter,
 			JsonAuthenticationEntryPoint authenticationEntryPoint,
 			JsonAccessDeniedHandler accessDeniedHandler,
-			AppCorsProperties corsProperties) throws Exception {
+			AppCorsProperties corsProperties) {
 		http.securityMatcher("/api/**");
 		http.csrf(csrf -> csrf.disable());
 		http.anonymous(anonymous -> anonymous.disable());
@@ -60,7 +60,12 @@ public class ApiSecurityConfig {
 				.authenticationEntryPoint(authenticationEntryPoint)
 				.accessDeniedHandler(accessDeniedHandler));
 		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-		return http.build();
+		try {
+			return http.build();
+		}
+		catch (Exception cause) {
+			throw new SecurityFilterChainConfigurationException("Failed to build API security filter chain", cause);
+		}
 	}
 
 	@Bean
