@@ -22,6 +22,10 @@ services:
     build: .
     ports:
       - "${APP_HOST_PORT:-8080}:8080"
+    sysctls:
+      # Mitiga hallazgos tipo "TCP Timestamps Information Disclosure" en informes OpenVAS (NVT 80091).
+      # En Docker Desktop algunos entornos ignoran sysctls de red; ver docs/security/greenbone-openvas.md.
+      - net.ipv4.tcp_timestamps=0
     depends_on:
       mysql:
         condition: service_healthy
