@@ -27,7 +27,8 @@ import java.util.List;
 @EnableConfigurationProperties(AppCorsProperties.class)
 public class ApiSecurityConfig {
 
-	private static final String API_PETS_WILDCARD_PATH = "/api/pets/**";
+	private static final String API_PETS_ANT_PATTERN = "/api/pets/**"; // NOSONAR java:S1075
+
 	private static final String ADMIN_ROLE = "ADMIN";
 	private static final String STAFF_ROLE = "STAFF";
 
@@ -41,7 +42,7 @@ public class ApiSecurityConfig {
 			AppCorsProperties corsProperties) {
 		http.securityMatcher("/api/**");
 		http.csrf(AbstractHttpConfigurer::disable);
-		http.anonymous(anonymous -> anonymous.disable());
+		http.anonymous(AbstractHttpConfigurer::disable);
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		http.cors(cors -> cors.configurationSource(corsConfigurationSource(corsProperties)));
 		http.headers(headers -> headers
@@ -51,10 +52,10 @@ public class ApiSecurityConfig {
 				.httpStrictTransportSecurity(HstsConfig::disable));
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/pets", API_PETS_WILDCARD_PATH).permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/pets", API_PETS_ANT_PATTERN).permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/pets").hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
-				.requestMatchers(HttpMethod.PUT, API_PETS_WILDCARD_PATH).hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
-				.requestMatchers(HttpMethod.DELETE, API_PETS_WILDCARD_PATH).hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
+				.requestMatchers(HttpMethod.PUT, API_PETS_ANT_PATTERN).hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
+				.requestMatchers(HttpMethod.DELETE, API_PETS_ANT_PATTERN).hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
 				.requestMatchers(HttpMethod.GET, "/api/appointments/my").authenticated()
 				.requestMatchers(HttpMethod.POST, "/api/appointments/new/**").hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
 				.requestMatchers(HttpMethod.PUT, "/api/appointments/update/**").hasAnyRole(ADMIN_ROLE, STAFF_ROLE)
