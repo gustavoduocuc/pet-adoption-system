@@ -10,6 +10,7 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.HstsConfig;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -27,7 +28,7 @@ public class WebSecurityConfig {
 	@Order(0)
 	public SecurityFilterChain actuatorHealthSecurityFilterChain(
 			HttpSecurity http,
-			AppActuatorHealthSecurityProperties actuatorHealthSecurityProperties) throws Exception {
+			AppActuatorHealthSecurityProperties actuatorHealthSecurityProperties) {
 		http.securityMatcher("/actuator/**");
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.formLogin(AbstractHttpConfigurer::disable);
@@ -43,7 +44,7 @@ public class WebSecurityConfig {
 	@Order(2)
 	public SecurityFilterChain webSecurityFilterChain(
 			HttpSecurity http,
-			RoleBasedAuthenticationSuccessHandler successHandler) throws Exception {
+			RoleBasedAuthenticationSuccessHandler successHandler) {
 		http.securityMatcher(request -> !request.getRequestURI().startsWith("/api/")
 				&& !request.getRequestURI().startsWith("/actuator/"));
 		http.headers(headers -> headers
@@ -51,7 +52,7 @@ public class WebSecurityConfig {
 						"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'"))
 				.frameOptions(frame -> frame.deny())
 				.referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-				.httpStrictTransportSecurity(hsts -> hsts.disable()));
+				.httpStrictTransportSecurity(HstsConfig::disable));
 		http.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/", "/catalog", "/catalog/**").permitAll()
 				.requestMatchers("/login", "/error", "/access-denied").permitAll()
