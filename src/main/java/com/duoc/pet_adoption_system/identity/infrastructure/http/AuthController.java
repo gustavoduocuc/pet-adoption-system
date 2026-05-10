@@ -24,14 +24,14 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+	public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
 		try {
 			LoginResult result = authenticateUserUseCase.execute(request.username(), request.password());
-			return ResponseEntity.ok(new LoginResponse(result.accessToken(), result.tokenType()));
+			return ResponseEntity.<Object>ok(new LoginResponse(result.accessToken(), result.tokenType()));
 		}
 		catch (DomainError error) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Map.of("error", "Unauthorized", "message", "Invalid username or password"));
+					.<Object>body(Map.of("error", "Unauthorized", "message", "Invalid username or password"));
 		}
 	}
 }

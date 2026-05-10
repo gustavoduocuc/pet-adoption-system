@@ -8,7 +8,7 @@ import com.duoc.pet_adoption_system.shared.domain.DomainError;
 
 public class AuthenticateUserUseCase {
 
-	private static final String invalidUsernameOrPasswordMessage = "Invalid username or password";
+	private static final String INVALID_USERNAME_OR_PASSWORD_MESSAGE = "Invalid username or password";
 
 	private final UserRepository userRepository;
 	private final EncodedPasswordVerifier encodedPasswordVerifier;
@@ -25,12 +25,12 @@ public class AuthenticateUserUseCase {
 
 	public LoginResult execute(String username, String rawPassword) {
 		if (rawPassword == null) {
-			throw DomainError.other(invalidUsernameOrPasswordMessage);
+			throw DomainError.other(INVALID_USERNAME_OR_PASSWORD_MESSAGE);
 		}
 		User user = userRepository.findByUsername(username)
-				.orElseThrow(() -> DomainError.other(invalidUsernameOrPasswordMessage));
+				.orElseThrow(() -> DomainError.other(INVALID_USERNAME_OR_PASSWORD_MESSAGE));
 		if (!encodedPasswordVerifier.matches(rawPassword, user.passwordHash())) {
-			throw DomainError.other(invalidUsernameOrPasswordMessage);
+			throw DomainError.other(INVALID_USERNAME_OR_PASSWORD_MESSAGE);
 		}
 		String token = accessTokenIssuer.issue(user.username(), user.roles());
 		return new LoginResult(token, "Bearer");
