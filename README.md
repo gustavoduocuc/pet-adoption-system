@@ -195,6 +195,33 @@ Sin `--profile https`, `docker compose --env-file .env.docker up --build` sigue 
 
 Flujo: cliente → **HTTPS:443** (o **HTTP:80** → redirección) → contenedor `proxy` → **HTTP** interno → **`app:8080`** → JDBC → `mysql`.
 
+### Greenbone Community Edition (OpenVAS / GSA, opcional)
+
+El stack **Greenbone** (escaneo de vulnerabilidades) está detrás del perfil Compose **`greenbone`**: no se arranca si no se solicita. Requiere **mucha RAM y disco** en la primera sincronización de feeds; guía y flujo de feeds: [Greenbone Community Containers](https://greenbone.github.io/docs/latest/22.4/container/index.html).
+
+Primera vez (o para actualizar feeds) si tu red **sí** alcanza el registro de Greenbone:
+
+```bash
+docker compose --env-file .env.docker --profile greenbone pull
+docker compose --env-file .env.docker --profile greenbone up -d
+```
+
+Si el registro **no** responde pero **ya tienes** las imágenes en Docker Desktop (mismo nombre `registry.community.greenbone.net/community/...`), **no ejecutes `pull`** (fallaría). Arranca solo con:
+
+```bash
+docker compose --env-file .env.docker --profile greenbone up -d --pull never
+```
+
+El compose usa `pull_policy: missing` en esos servicios: con `up` normal suele bastar la caché local; `--pull never` evita cualquier intento de contactar el registro al crear contenedores.
+
+Interfaz web (GSA, TLS autofirmado): abre **`https://127.0.0.1:8443`** si usas el valor por defecto de **`GREENBONE_NGINX_HTTPS_PORT`** (mapea el **443** interno de nginx; no es el puerto **9392**). Si cambiaste el puerto en `.env.docker`, usa ese valor. Los puertos están enlazados solo a **127.0.0.1** (no a todas las interfaces); usa **`127.0.0.1`**, no solo `localhost`, si tu sistema prioriza IPv6. El **9392** del compose es un segundo mapeo del contenedor; la doc oficial de acceso suele equivaler a **HTTPS en el puerto configurado como HTTPS** (p. ej. 8443). Si levantas también el perfil **`https`** (Apache), evita choque de puertos o redefine `GREENBONE_NGINX_*` / `HTTPS_HOST_PORT`.
+
+Credenciales iniciales y cambio de contraseña del usuario `admin`: ver la misma documentación oficial (sección *Setting up an Admin User*).
+
+**Escanear un contenedor de este mismo proyecto por IP (p. ej. `app` en `172.23.0.x`):** el tráfico sale de `ospd-openvas`. Ese servicio está en `greenbone_net` **y** en la red `default` del compose (la de `mysql` / `app`) para que el escáner pueda alcanzar esas IPs. Si añades otro servicio en una red distinta (`app_net`, etc.), habría que conectar también `ospd-openvas` a esa red o usar un target alcanzable desde `default`.
+
+**Si `docker compose ... pull` falla** con `connection refused` o timeout hacia `registry.community.greenbone.net:443`, el problema es de **red hasta el registro de Greenbone**, no del nombre de la imagen `report-formats` (las demás suelen marcarse como *Interrupted* porque Compose cancela el pull paralelo). Comprueba desde el host: `curl -vI https://registry.community.greenbone.net/v2/` (debe completar el handshake TLS). Prueba otra red (datos móviles, sin VPN), revisa firewall o proxy corporativo y, en Docker Desktop, *Settings → Resources → Proxies* si tu entorno lo exige. Para un mirror interno, publica las mismas imágenes en tu registry y define **`GREENBONE_IMAGE_PREFIX`** en `.env.docker` (prefijo **sin** barra final; ver [`.env.docker.example`](.env.docker.example)).
+
 #### Producción (idea simple)
 
 - El **8080** de la app es **solo red interna** (Docker)
