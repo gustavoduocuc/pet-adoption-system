@@ -27,11 +27,14 @@ class PatientTest {
 
 	@Test
 	void createRejectsNameWithSpecialCharacters() {
+		Id id = Id.generate();
+		LocalDate intakeDate = LocalDate.of(2026, 1, 15);
+
 		DomainError error = assertThrows(DomainError.class, () -> Patient.create(
-				Id.generate(),
+				id,
 				"'; DROP TABLE patients;--",
 				"dog",
-				LocalDate.of(2026, 1, 15),
+				intakeDate,
 				"",
 				CareStatus.UNDER_CARE));
 
@@ -41,11 +44,14 @@ class PatientTest {
 	@Test
 	void createRejectsNameLongerThanAllowed() {
 		String longName = "a".repeat(121);
+		Id id = Id.generate();
+		LocalDate intakeDate = LocalDate.of(2026, 1, 15);
+
 		assertThrows(DomainError.class, () -> Patient.create(
-				Id.generate(),
+				id,
 				longName,
 				"dog",
-				LocalDate.of(2026, 1, 15),
+				intakeDate,
 				"",
 				CareStatus.UNDER_CARE));
 	}

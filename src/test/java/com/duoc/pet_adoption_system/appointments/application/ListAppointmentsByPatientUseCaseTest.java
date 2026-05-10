@@ -49,7 +49,8 @@ class ListAppointmentsByPatientUseCaseTest {
 		var useCase = new ListAppointmentsByPatientUseCase(
 				new InMemoryAppointmentRepository(),
 				new InMemoryPatientRepository());
+		String unknownPatientId = Id.generate().value();
 
-		assertThrows(DomainError.class, () -> useCase.execute(Id.generate().value()));
+		assertThrows(DomainError.class, () -> useCase.execute(unknownPatientId));
 	}
 }

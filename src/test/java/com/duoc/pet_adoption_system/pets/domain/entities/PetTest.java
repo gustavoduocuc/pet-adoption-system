@@ -28,16 +28,17 @@ class PetTest {
 
 	@Test
 	void createRejectsNullSpecies() {
-		assertThrows(DomainError.class, () -> Pet.create(
-				Id.generate(),
-				new PetAttributes(
-						"Luna",
-						null,
-						"mix",
-						2,
-						"Santiago",
-						PetGender.FEMALE,
-						AdoptionStatus.AVAILABLE)));
+		Id id = Id.generate();
+		PetAttributes attributes = new PetAttributes(
+				"Luna",
+				null,
+				"mix",
+				2,
+				"Santiago",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE);
+
+		assertThrows(DomainError.class, () -> Pet.create(id, attributes));
 	}
 
 	@Test
@@ -69,72 +70,77 @@ class PetTest {
 
 	@Test
 	void createRejectsBlankName() {
-		assertThrows(DomainError.class, () -> Pet.create(
-				Id.generate(),
-				new PetAttributes(
-						"  ",
-						PetSpecies.DOG,
-						"mix",
-						2,
-						"Santiago",
-						PetGender.FEMALE,
-						AdoptionStatus.AVAILABLE)));
+		Id id = Id.generate();
+		PetAttributes attributes = new PetAttributes(
+				"  ",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE);
+
+		assertThrows(DomainError.class, () -> Pet.create(id, attributes));
 	}
 
 	@Test
 	void createRejectsNegativeAge() {
-		assertThrows(DomainError.class, () -> Pet.create(
-				Id.generate(),
-				new PetAttributes(
-						"Luna",
-						PetSpecies.DOG,
-						"mix",
-						-1,
-						"Santiago",
-						PetGender.FEMALE,
-						AdoptionStatus.AVAILABLE)));
+		Id id = Id.generate();
+		PetAttributes attributes = new PetAttributes(
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				-1,
+				"Santiago",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE);
+
+		assertThrows(DomainError.class, () -> Pet.create(id, attributes));
 	}
 
 	@Test
 	void createRejectsBlankLocation() {
-		assertThrows(DomainError.class, () -> Pet.create(
-				Id.generate(),
-				new PetAttributes(
-						"Luna",
-						PetSpecies.DOG,
-						"mix",
-						2,
-						"  ",
-						PetGender.FEMALE,
-						AdoptionStatus.AVAILABLE)));
+		Id id = Id.generate();
+		PetAttributes attributes = new PetAttributes(
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"  ",
+				PetGender.FEMALE,
+				AdoptionStatus.AVAILABLE);
+
+		assertThrows(DomainError.class, () -> Pet.create(id, attributes));
 	}
 
 	@Test
 	void createRejectsNullGender() {
-		assertThrows(DomainError.class, () -> Pet.create(
-				Id.generate(),
-				new PetAttributes(
-						"Luna",
-						PetSpecies.DOG,
-						"mix",
-						2,
-						"Santiago",
-						null,
-						AdoptionStatus.AVAILABLE)));
+		Id id = Id.generate();
+		PetAttributes attributes = new PetAttributes(
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				null,
+				AdoptionStatus.AVAILABLE);
+
+		assertThrows(DomainError.class, () -> Pet.create(id, attributes));
 	}
 
 	@Test
 	void createRejectsNullAdoptionStatus() {
-		assertThrows(DomainError.class, () -> Pet.create(
-				Id.generate(),
-				new PetAttributes(
-						"Luna",
-						PetSpecies.DOG,
-						"mix",
-						2,
-						"Santiago",
-						PetGender.FEMALE,
-						null)));
+		Id id = Id.generate();
+		PetAttributes attributes = new PetAttributes(
+				"Luna",
+				PetSpecies.DOG,
+				"mix",
+				2,
+				"Santiago",
+				PetGender.FEMALE,
+				null);
+
+		assertThrows(DomainError.class, () -> Pet.create(id, attributes));
 	}
 
 	@Test
@@ -150,13 +156,15 @@ class PetTest {
 						PetGender.FEMALE,
 						AdoptionStatus.AVAILABLE));
 
-		assertThrows(DomainError.class, () -> pet.updateDetails(new PetAttributes(
+		PetAttributes invalidUpdate = new PetAttributes(
 				"  ",
 				PetSpecies.CAT,
 				"siames",
 				3,
 				"Valparaiso",
 				PetGender.FEMALE,
-				AdoptionStatus.ADOPTED)));
+				AdoptionStatus.ADOPTED);
+
+		assertThrows(DomainError.class, () -> pet.updateDetails(invalidUpdate));
 	}
 }

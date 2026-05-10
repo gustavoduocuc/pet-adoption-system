@@ -50,12 +50,14 @@ class CreateAppointmentUseCaseTest {
 		var useCase = new CreateAppointmentUseCase(
 				new InMemoryAppointmentRepository(),
 				new InMemoryPatientRepository());
+		String missingPatientId = Id.generate().value();
+		LocalDateTime when = LocalDateTime.now();
 
 		assertThrows(
 				DomainError.class,
 				() -> useCase.execute(
-						Id.generate().value(),
-						LocalDateTime.now(),
+						missingPatientId,
+						when,
 						"",
 						AppointmentStatus.SCHEDULED,
 						"staff"));
