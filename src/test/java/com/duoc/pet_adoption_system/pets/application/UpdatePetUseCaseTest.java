@@ -52,18 +52,15 @@ class UpdatePetUseCaseTest {
 		InMemoryPetRepository repository = new InMemoryPetRepository();
 		var useCase = new UpdatePetUseCase(repository);
 		String nonExistentId = Id.generate().value();
+		PetAttributes updatePayload = new PetAttributes(
+				"Max",
+				PetSpecies.CAT,
+				"siames",
+				5,
+				"Valparaiso",
+				PetGender.FEMALE,
+				AdoptionStatus.ADOPTED);
 
-		assertThrows(
-				DomainError.class,
-				() -> useCase.execute(
-						nonExistentId,
-						new PetAttributes(
-								"Max",
-								PetSpecies.CAT,
-								"siames",
-								5,
-								"Valparaiso",
-								PetGender.FEMALE,
-								AdoptionStatus.ADOPTED)));
+		assertThrows(DomainError.class, () -> useCase.execute(nonExistentId, updatePayload));
 	}
 }
