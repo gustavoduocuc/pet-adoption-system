@@ -39,12 +39,14 @@ class UpdateAppointmentUseCaseTest {
 	@Test
 	void rejectsWhenAppointmentMissing() {
 		var useCase = new UpdateAppointmentUseCase(new InMemoryAppointmentRepository());
+		String missingAppointmentId = Id.generate().value();
+		LocalDateTime when = LocalDateTime.now();
 
 		assertThrows(
 				DomainError.class,
 				() -> useCase.execute(
-						Id.generate().value(),
-						LocalDateTime.now(),
+						missingAppointmentId,
+						when,
 						"",
 						AppointmentStatus.CANCELLED));
 	}

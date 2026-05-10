@@ -35,10 +35,14 @@ class AppointmentTest {
 
 	@Test
 	void rejectsBlankCreatedByUsername() {
+		Id appointmentId = Id.generate();
+		Id patientId = Id.generate();
+		LocalDateTime when = LocalDateTime.now();
+
 		assertThrows(DomainError.class, () -> Appointment.create(
-				Id.generate(),
-				Id.generate(),
-				LocalDateTime.now(),
+				appointmentId,
+				patientId,
+				when,
 				"",
 				AppointmentStatus.SCHEDULED,
 				"   "));
