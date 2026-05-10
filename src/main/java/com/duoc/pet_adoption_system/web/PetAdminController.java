@@ -23,6 +23,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/app/pets")
 public class PetAdminController {
 
+	private static final String MODEL_EDIT_MODE = "editMode";
+	private static final String VIEW_PET_FORM = "app/pets/form";
+	private static final String FLASH_SUCCESS_MESSAGE = "successMessage";
+
 	private final ListAllPetsUseCase listAllPetsUseCase;
 	private final CreatePetUseCase createPetUseCase;
 	private final GetPetByIdUseCase getPetByIdUseCase;
@@ -51,8 +55,8 @@ public class PetAdminController {
 	@GetMapping("/new")
 	public String newForm(Model model) {
 		model.addAttribute("petForm", new PetForm());
-		model.addAttribute("editMode", false);
-		return "app/pets/form";
+		model.addAttribute(MODEL_EDIT_MODE, false);
+		return VIEW_PET_FORM;
 	}
 
 	@PostMapping("/new")
@@ -62,8 +66,8 @@ public class PetAdminController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("editMode", false);
-			return "app/pets/form";
+			model.addAttribute(MODEL_EDIT_MODE, false);
+			return VIEW_PET_FORM;
 		}
 		var pet = createPetUseCase.execute(
 				petForm.getName(),
@@ -73,7 +77,7 @@ public class PetAdminController {
 				petForm.getLocation(),
 				petForm.getGender(),
 				petForm.getAdoptionStatus());
-		redirectAttributes.addFlashAttribute("successMessage", "Mascota creada.");
+		redirectAttributes.addFlashAttribute(FLASH_SUCCESS_MESSAGE, "Mascota creada.");
 		return "redirect:/app/pets/" + pet.id().value() + "/edit";
 	}
 
@@ -90,8 +94,8 @@ public class PetAdminController {
 		form.setAdoptionStatus(pet.adoptionStatus());
 		model.addAttribute("petForm", form);
 		model.addAttribute("petId", id);
-		model.addAttribute("editMode", true);
-		return "app/pets/form";
+		model.addAttribute(MODEL_EDIT_MODE, true);
+		return VIEW_PET_FORM;
 	}
 
 	@PostMapping("/{id}/edit")
@@ -103,8 +107,8 @@ public class PetAdminController {
 			RedirectAttributes redirectAttributes) {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("petId", id);
-			model.addAttribute("editMode", true);
-			return "app/pets/form";
+			model.addAttribute(MODEL_EDIT_MODE, true);
+			return VIEW_PET_FORM;
 		}
 		updatePetUseCase.execute(
 				id,
@@ -116,14 +120,14 @@ public class PetAdminController {
 						petForm.getLocation(),
 						petForm.getGender(),
 						petForm.getAdoptionStatus()));
-		redirectAttributes.addFlashAttribute("successMessage", "Mascota actualizada.");
+		redirectAttributes.addFlashAttribute(FLASH_SUCCESS_MESSAGE, "Mascota actualizada.");
 		return "redirect:/app/pets";
 	}
 
 	@PostMapping("/{id}/delete")
 	public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
 		deletePetUseCase.execute(id);
-		redirectAttributes.addFlashAttribute("successMessage", "Mascota eliminada.");
+		redirectAttributes.addFlashAttribute(FLASH_SUCCESS_MESSAGE, "Mascota eliminada.");
 		return "redirect:/app/pets";
 	}
 }
